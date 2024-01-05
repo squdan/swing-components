@@ -11,6 +11,11 @@ import java.util.GregorianCalendar;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
+/**
+ * {@link CalendarDayCellRenderer} implementation that uses {@link JList} internally as value container.
+ * <p>
+ * This implementation manages a list of String values built from {@link CalendarDayCell} values converted to String.
+ */
 public class CalendarDayJListCellRenderer extends JList<String> implements CalendarDayCellRenderer {
 
     /**
@@ -74,25 +79,25 @@ public class CalendarDayJListCellRenderer extends JList<String> implements Calen
             String[] listValues;
 
             // Draw just first values
-            if (calendarDayCellValue.getCustomInfo().size() > LIMIT_CALENDAR_CELL_ITEMS) {
+            if (calendarDayCellValue.getValues().size() > LIMIT_CALENDAR_CELL_ITEMS) {
                 listValues = new String[LIMIT_CALENDAR_CELL_ITEMS + 1];
                 listValues[0] = getBoldText(calendarDayCellValue.getDay());
 
                 IntStream.range(0, LIMIT_CALENDAR_CELL_ITEMS).forEach(i -> {
-                    listValues[i + 1] = calendarDayCellValue.getCustomInfo().get(i).toString();
+                    listValues[i + 1] = calendarDayCellValue.getValues().get(i).toString();
                 });
 
-                listValues[LIMIT_CALENDAR_CELL_ITEMS] = (calendarDayCellValue.getCustomInfo().size() - LIMIT_CALENDAR_CELL_ITEMS)
+                listValues[LIMIT_CALENDAR_CELL_ITEMS] = (calendarDayCellValue.getValues().size() - LIMIT_CALENDAR_CELL_ITEMS)
                         + MORE_ITEMS;
             }
 
             // Draw all values
             else {
-                listValues = new String[calendarDayCellValue.getCustomInfo().size() + 1];
+                listValues = new String[calendarDayCellValue.getValues().size() + 1];
                 listValues[0] = getBoldText(calendarDayCellValue.getDay());
 
-                IntStream.range(0, calendarDayCellValue.getCustomInfo().size()).forEach(i -> {
-                    listValues[i + 1] = calendarDayCellValue.getCustomInfo().get(i).toString();
+                IntStream.range(0, calendarDayCellValue.getValues().size()).forEach(i -> {
+                    listValues[i + 1] = calendarDayCellValue.getValues().get(i).toString();
                 });
             }
 
@@ -120,6 +125,6 @@ public class CalendarDayJListCellRenderer extends JList<String> implements Calen
     }
 
     private String getBoldText(final Object source) {
-        return BOLD_INIT + String.valueOf(source) + BOLD_END;
+        return BOLD_INIT + source + BOLD_END;
     }
 }

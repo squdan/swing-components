@@ -20,12 +20,20 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
+/**
+ * Calendar representation using {@link JPanel}.
+ * <p>
+ * Each day is represented with {@link CalendarDayCell} which contains custom information
+ * when user implements {@link io.github.squdan.swing.components.calendar.cell.CalendarDayCellValue}.
+ * <p>
+ * Calendar information is loaded from {@link CalendarDataProviderService} service.
+ * <p>
+ * Users can execute actions over cells using defined actions at {@link CalendarDayActions} which will execute methods
+ * from {@link CalendarDataManagerService}.
+ */
 @Slf4j
 public class CalendarPanel extends JPanel {
 
-    /**
-     * Generated Serial Version UID
-     */
     @Serial
     private static final long serialVersionUID = 7616964167280354806L;
 
@@ -71,6 +79,14 @@ public class CalendarPanel extends JPanel {
     private int selectedRow;
     private int selectedColumn;
 
+    /**
+     * Constructor to configure calendar requirements.
+     *
+     * @param window       current {@link JFrame} to calculate the table size.
+     * @param cellRenderer renderer to apply in each cell/day.
+     * @param service      to load calendar information.
+     * @param actions      available actions to execute in each cell by the user.
+     */
     public CalendarPanel(final JFrame window, final CalendarDayCellRenderer cellRenderer,
                          final CalendarDataProviderService service, final CalendarDayActions actions) {
         // Panel initialization
@@ -103,6 +119,9 @@ public class CalendarPanel extends JPanel {
         changeYearButton.addActionListener(new ChangeYearActionListener());
     }
 
+    /**
+     * Refresh calendar information and buttons.
+     */
     public void refresh() {
         // Update row height by windows size
         calendarTable.setRowHeight((int) Math.round(window.getWidth() / 17));
@@ -215,12 +234,12 @@ public class CalendarPanel extends JPanel {
             final int finalDay = day;
             final int finalRow = row;
             final int finalColumn = column;
-            final CompletableFuture<CalendarDayCell> calendarDayCellInfo = service.getAsync(selectedYear,
+            final CompletableFuture<CalendarDayCell> calendarDayCellInfo = service.get(selectedYear,
                     (selectedMonth + 1), day, row, column);
 
             calendarDayCellInfo.whenComplete((info, exception) -> {
                 if (Objects.isNull(exception)) {
-                    if (!info.getCustomInfo().isEmpty()) {
+                    if (!info.getValues().isEmpty()) {
                         calendarTableModel.setValueAt(info, finalRow, finalColumn);
                     }
                 } else {

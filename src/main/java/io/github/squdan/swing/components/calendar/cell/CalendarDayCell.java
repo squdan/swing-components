@@ -10,6 +10,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Cell element from {@link io.github.squdan.swing.components.calendar.CalendarPanel} with information about
+ * the day/month/year from the calendar and a list of values associated to this day.
+ */
 @Data
 @AllArgsConstructor
 public class CalendarDayCell {
@@ -26,13 +30,13 @@ public class CalendarDayCell {
     private int month;
     private int year;
 
-    private List<CalendarDayCellCustomInfo> customInfo;
+    private List<CalendarDayCellValue> values;
 
     public CalendarDayCell(final int year, final int month, final int day) {
         this.year = year;
         this.month = month;
         this.day = day;
-        this.customInfo = new ArrayList<>();
+        this.values = new ArrayList<>();
     }
 
     public Instant getInstantUtc() {
@@ -51,8 +55,8 @@ public class CalendarDayCell {
         final StringBuilder result = new StringBuilder();
         result.append(HTML_INIT);
 
-        if (CollectionUtils.isNotEmpty(customInfo)) {
-            customInfo.stream().forEach(i -> {
+        if (CollectionUtils.isNotEmpty(values)) {
+            values.stream().forEach(i -> {
                 result.append(NEW_LINE);
                 result.append(i.getTimeAsString());
             });
@@ -70,10 +74,10 @@ public class CalendarDayCell {
         result.append(day);
         result.append(BOLD_END);
 
-        if (CollectionUtils.isNotEmpty(customInfo)) {
-            customInfo.stream().forEach(a -> {
+        if (CollectionUtils.isNotEmpty(values)) {
+            values.stream().forEach(a -> {
                 result.append(NEW_LINE);
-                result.append(a.getCustomInfoAsString());
+                result.append(a.getValueAsString());
             });
         }
         result.append(HTML_END);

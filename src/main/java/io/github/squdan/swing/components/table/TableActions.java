@@ -32,10 +32,10 @@ public class TableActions<T> {
 		this(service, true);
 	}
 
-	protected TableActions(final TableDataManagerService<T> service, final boolean initializeActions) {
+	protected TableActions(final TableDataManagerService<T> service, final boolean useDefaultActions) {
 		this.service = service;
 
-		if (initializeActions) {
+		if (useDefaultActions) {
 			// Initialize global actions JPopupMenu
 			globalActionsMenu.add(globalActionNew);
 

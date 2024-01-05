@@ -1,4 +1,4 @@
-name: querydsl-filters
+name: swing-components
 
 # Configuration: when to run the jobs
 on:
@@ -22,7 +22,7 @@ jobs:
 
     # Job steps
     env:
-      ARTIFACT_NAME: querydsl-filters
+      ARTIFACT_NAME: swing-components
 
     # Job steps
     steps:
@@ -55,12 +55,6 @@ jobs:
           echo "project_version=$project_version" >> $GITHUB_OUTPUT
           echo Version detected: $project_version
 
-      # Generate test sources
-      - name: Generate test sources
-        run: |
-          mvn generate-test-sources
-          mvn test-compile
-
       # Run tests to validate the code
       - name: Run tests
         run: |
@@ -89,26 +83,11 @@ jobs:
         run: |
           mvn install -DskipTests -s .m2/settings.xml
 
-      # Send coverage report to coveralls
-      - name: Send coverage report to coveralls
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        env:
-          COVERALLS_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
-        run:  |
-          mvn --batch-mode coveralls:report
-
-      # Upload coverage report
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v3
-        with:
-          name: jacoco-coverage-report
-          path: target/site/jacoco
-
       # Upload artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: querydsl-filter-${{ steps.project-version.outputs.project_version }}
+          name: ${{ env.ARTIFACT_NAME }}-${{ steps.project-version.outputs.project_version }}
           path: target/${{ env.ARTIFACT_NAME }}-${{ steps.project-version.outputs.project_version }}.jar
 
       # Deploy
