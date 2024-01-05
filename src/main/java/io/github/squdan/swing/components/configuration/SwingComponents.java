@@ -1,5 +1,6 @@
 package io.github.squdan.swing.components.configuration;
 
+import com.formdev.flatlaf.FlatIntelliJLaf;
 import io.github.squdan.swing.components.SwingComponentsException;
 
 import java.util.Objects;
@@ -10,6 +11,11 @@ public class SwingComponents {
 
     public static void setup(final SwingComponentsConfiguration configuration) {
         SwingComponents.configuration = configuration;
+
+        // Styles configuration (https://www.formdev.com/flatlaf/)
+        // Intellij Themes
+        // (https://github.com/JFormDesigner/FlatLaf/tree/main/flatlaf-intellij-themes)
+        FlatIntelliJLaf.setup();
     }
 
     public static SwingComponentsConfiguration getConfiguration() {
