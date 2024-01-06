@@ -1,7 +1,9 @@
 package io.github.squdan.swing.components.list;
 
-import io.github.squdan.swing.components.ComponentItem;
-import io.github.squdan.swing.components.ComponentItemDefaultActionService;
+import io.github.squdan.swing.components.SwingComponentsItem;
+import io.github.squdan.swing.components.list.action.ListActionService;
+import io.github.squdan.swing.components.list.cell.ListItemTextFieldCellRenderer;
+import io.github.squdan.swing.components.list.cell.ListModelNoSelection;
 import lombok.Getter;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -13,11 +15,14 @@ import java.io.Serial;
 import java.util.List;
 import java.util.Objects;
 
-public class ListPanel<T extends ComponentItem<K>, K> extends JPanel {
+/**
+ * List items representation using {@link JPanel}.
+ * <p>
+ * This implementation will show a container with a list of elements that will offer an on-click action if it's
+ * implemented at received {@link ListActionService} implementation.
+ */
+public class ListPanel<T extends SwingComponentsItem<K>, K> extends JPanel {
 
-    /**
-     * Generated Serial Version UID
-     */
     @Serial
     private static final long serialVersionUID = 5291140686384373317L;
 
@@ -34,7 +39,7 @@ public class ListPanel<T extends ComponentItem<K>, K> extends JPanel {
         this(header, values, null);
     }
 
-    public ListPanel(final JLabel header, final List<T> values, final ComponentItemDefaultActionService<T, K> managementService) {
+    public ListPanel(final JLabel header, final List<T> values, final ListActionService<T, K> managementService) {
         super(new GridLayout(0, 1));
 
         // Initializations
@@ -82,9 +87,9 @@ public class ListPanel<T extends ComponentItem<K>, K> extends JPanel {
     private class SelectedElementListener implements ListSelectionListener {
 
         // Service
-        private final ComponentItemDefaultActionService<T, K> managementService;
+        private final ListActionService<T, K> managementService;
 
-        public SelectedElementListener(final ComponentItemDefaultActionService<T, K> managementService) {
+        public SelectedElementListener(final ListActionService<T, K> managementService) {
             this.managementService = managementService;
         }
 

@@ -1,9 +1,14 @@
-package io.github.squdan.swing.components.text.composed;
+package io.github.squdan.swing.components.text.phone;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * Model that contains phone information.
+ * <p>
+ * This model is used at {@link PhoneWithCountrySelectorPanelGenerator}.
+ */
 @Data
 @Builder
 @AllArgsConstructor

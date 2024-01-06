@@ -1,4 +1,4 @@
-package io.github.squdan.swing.components.table;
+package io.github.squdan.swing.components.table.action;
 
 import io.github.squdan.swing.components.text.FilterTextField;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +14,11 @@ import javax.swing.text.BadLocationException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Defines how filters should work at {@link io.github.squdan.swing.components.table.TablePanel}.
+ *
+ * @param <T> AbstractTableModel implementation.
+ */
 @Slf4j
 public class TableFilterListener<T extends AbstractTableModel> implements DocumentListener {
 

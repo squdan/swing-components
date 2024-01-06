@@ -13,11 +13,13 @@ import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Objects;
 
+/**
+ * Datepicker representation using {@link JPanel}.
+ * <p>
+ * This implementation will show a calendar where user can select a day which will be returned with method getSelectedDate().
+ */
 public class DatePickerPanel extends JPanel {
 
-    /**
-     * Generated Serial Version UID
-     */
     @Serial
     private static final long serialVersionUID = -4745317742413051176L;
 

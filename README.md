@@ -42,9 +42,9 @@ components.
 ```java
 package io.github.squdan.swing.components.examples;
 
-import com.formdev.flatlaf.FlatIntelliJLaf;
+import io.github.squdan.swing.components.FlatLafFontText;
 import io.github.squdan.swing.components.FontText;
-import io.github.squdan.swing.components.FontTitles;
+import io.github.squdan.swing.components.FlatLafFontTitles;
 import io.github.squdan.swing.components.configuration.SwingComponents;
 import io.github.squdan.swing.components.configuration.SwingComponentsConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -76,9 +76,9 @@ public class ExampleApplication {
         // SwingComponents dependency configuration
         SwingComponents.setup(SwingComponentsConfiguration.builder()
                 .textConfiguration(SwingComponentsConfiguration.SwingComponentsTextConfiguration.builder()
-                        .titleFont(FontTitles.FONT_TITLE_1.getFont())
-                        .titleSecondaryFont(FontTitles.FONT_TITLE_2.getFont())
-                        .defaultText(FontText.FONT_DEFAULT.getFont())
+                        .titleFont(FlatLafFontTitles.FONT_TITLE_1.getFont())
+                        .titleSecondaryFont(FlatLafFontTitles.FONT_TITLE_2.getFont())
+                        .defaultText(FlatLafFontText.FONT_DEFAULT.getFont())
                         .build())
                 .colorConfiguration(SwingComponentsConfiguration.SwingComponentsColorConfiguration.builder()
                         .primary(ApplicationColors.PRIMARY_COLOR.getColor())

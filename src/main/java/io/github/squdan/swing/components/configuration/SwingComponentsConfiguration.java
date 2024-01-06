@@ -6,14 +6,27 @@ import lombok.Getter;
 
 import java.awt.*;
 
+/**
+ * Model that contains required configuration by Swing-Components library.
+ */
 @Getter
 @Builder
 @AllArgsConstructor
 public class SwingComponentsConfiguration {
 
+    /**
+     * Text configuration.
+     */
     private SwingComponentsTextConfiguration textConfiguration;
+
+    /**
+     * Colors configuration.
+     */
     private SwingComponentsColorConfiguration colorConfiguration;
 
+    /**
+     * Text configuration.
+     */
     @Getter
     @Builder
     @AllArgsConstructor
@@ -23,6 +36,9 @@ public class SwingComponentsConfiguration {
         private Font titleSecondaryFont;
     }
 
+    /**
+     * Colors configuration.
+     */
     @Getter
     @Builder
     @AllArgsConstructor

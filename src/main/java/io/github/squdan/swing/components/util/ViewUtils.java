@@ -1,9 +1,8 @@
 package io.github.squdan.swing.components.util;
 
-import io.github.squdan.swing.components.CustomButtonBorder;
+import io.github.squdan.swing.components.util.customize.CustomButtonBorder;
 import io.github.squdan.swing.components.SwingComponentsException;
 import io.github.squdan.swing.components.configuration.SwingComponents;
-import io.github.squdan.swing.components.configuration.SwingComponentsConfiguration;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.FileUtils;

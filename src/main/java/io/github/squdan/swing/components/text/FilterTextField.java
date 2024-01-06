@@ -1,6 +1,6 @@
 package io.github.squdan.swing.components.text;
 
-import io.github.squdan.swing.components.table.TableFilterListener;
+import io.github.squdan.swing.components.table.action.TableFilterListener;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

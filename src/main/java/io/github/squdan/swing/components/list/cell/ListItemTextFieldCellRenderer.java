@@ -1,7 +1,9 @@
-package io.github.squdan.swing.components.list;
+package io.github.squdan.swing.components.list.cell;
 
-import io.github.squdan.swing.components.ComponentItem;
+import io.github.squdan.swing.components.SwingComponentsItem;
 import io.github.squdan.swing.components.configuration.SwingComponents;
+import io.github.squdan.swing.components.list.EditableListPanel;
+import io.github.squdan.swing.components.list.ListPanel;
 import io.github.squdan.swing.components.util.ViewUtils;
 
 import javax.swing.*;
@@ -9,6 +11,13 @@ import java.awt.*;
 import java.io.Serial;
 import java.util.Objects;
 
+/**
+ * {@link DefaultListCellRenderer} implementation that defines how {@link ListPanel} and {@link EditableListPanel}
+ * should be rendered.
+ * <p>
+ * This implementation represents each element as a button. Elements must implement {@link SwingComponentsItem} to use defined
+ * toTextField() method implementation to write result as button text content.
+ */
 public class ListItemTextFieldCellRenderer extends DefaultListCellRenderer {
 
     /**
@@ -27,8 +36,8 @@ public class ListItemTextFieldCellRenderer extends DefaultListCellRenderer {
             result.setForeground(SwingComponents.getConfiguration().getColorConfiguration().getPrimaryText());
             result.setFont(SwingComponents.getConfiguration().getTextConfiguration().getTitleSecondaryFont());
 
-            if (value instanceof ComponentItem<?>) {
-                final ComponentItem<?> valueCasted = (ComponentItem<?>) value;
+            if (value instanceof SwingComponentsItem<?>) {
+                final SwingComponentsItem<?> valueCasted = (SwingComponentsItem<?>) value;
                 result.setText(valueCasted.toTextField());
             } else {
                 result.setText(value.toString());

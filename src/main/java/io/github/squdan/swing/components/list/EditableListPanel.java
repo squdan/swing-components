@@ -1,9 +1,10 @@
 package io.github.squdan.swing.components.list;
 
-import io.github.squdan.swing.components.ComponentItem;
-import io.github.squdan.swing.components.ComponentItemManagerService;
-import io.github.squdan.swing.components.util.ViewUtils;
+import io.github.squdan.swing.components.SwingComponentsItem;
+import io.github.squdan.swing.components.list.action.EditableListActionService;
+import io.github.squdan.swing.components.list.cell.ListItemTextFieldCellRenderer;
 import io.github.squdan.swing.components.text.autocomplete.PlaceholderSearchAutocompleteTextField;
+import io.github.squdan.swing.components.util.ViewUtils;
 import lombok.Getter;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -18,16 +19,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class EditableListPanel<T extends ComponentItem<K>, K> extends JPanel {
+/**
+ * List items representation using {@link JPanel}.
+ * <p>
+ * This implementation will show a container with a list of elements that will offer a create action if it's
+ * implemented at received {@link EditableListActionService} implementation.
+ * <p>
+ * Also, this implementation allows to the user add or remove elements from the selected elements into the list.
+ */
+public class EditableListPanel<T extends SwingComponentsItem<K>, K> extends JPanel {
 
-    /**
-     * Generated Serial Version UID
-     */
     @Serial
     private static final long serialVersionUID = 5291140686381473317L;
 
     // Service
-    private final ComponentItemManagerService<T, K> managementService;
+    private final EditableListActionService<T, K> managementService;
 
     // Data
     @Getter
@@ -45,7 +51,7 @@ public class EditableListPanel<T extends ComponentItem<K>, K> extends JPanel {
         this(header, null, values, null);
     }
 
-    public EditableListPanel(final JLabel header, final ComponentItemManagerService<T, K> managementService,
+    public EditableListPanel(final JLabel header, final EditableListActionService<T, K> managementService,
                              final List<T> values, final List<T> defaultSelectedValues) {
         super();
 

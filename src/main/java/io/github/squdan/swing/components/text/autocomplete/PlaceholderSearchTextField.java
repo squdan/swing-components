@@ -2,7 +2,7 @@ package io.github.squdan.swing.components.text.autocomplete;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.icons.FlatSearchWithHistoryIcon;
-import io.github.squdan.swing.components.ComponentItem;
+import io.github.squdan.swing.components.SwingComponentsItem;
 import io.github.squdan.swing.components.text.PlaceholderTextField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,14 +23,16 @@ import java.io.Serial;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * {@link PlaceholderTextField} implementation that also offers searching feature.
+ * <p>
+ * A button will be showed and user could use it to select some available value.
+ */
 @Slf4j
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class PlaceholderSearchTextField<T extends ComponentItem<K>, K> extends PlaceholderTextField {
+public class PlaceholderSearchTextField<T extends SwingComponentsItem<K>, K> extends PlaceholderTextField {
 
-    /**
-     * Generated Serial Version UID
-     */
     @Serial
     private static final long serialVersionUID = 6388663249826231852L;
 
@@ -41,10 +43,23 @@ public class PlaceholderSearchTextField<T extends ComponentItem<K>, K> extends P
     // Data
     private SelectedItemListener<T, K> searchListener;
 
+    /**
+     * Constructor without placeholder, this one just offers search feature.
+     *
+     * @param values: available values to show with search button.
+     */
     public PlaceholderSearchTextField(final List<T> values) {
         this(null, values);
     }
 
+    /**
+     * Constructor with placeholder and search feature.
+     * <p>
+     * While value is empty, placeholder will be showed.
+     *
+     * @param placeholder: text to show when no value.
+     * @param values:      available values to show with search button.
+     */
     public PlaceholderSearchTextField(final String placeholder, final List<T> values) {
         super(placeholder, null);
 
@@ -59,12 +74,16 @@ public class PlaceholderSearchTextField<T extends ComponentItem<K>, K> extends P
         this.getDocument().addDocumentListener(searchListener);
     }
 
+    /**
+     * Returns selected value by user.
+     *
+     * @return Selected value.
+     */
     public T getSelectedItem() {
         return searchListener.getSelectedItem();
     }
 
-    private JButton getSearchButton(final String toolTipDesc, final String noValuesDesc,
-                                    final List<? extends ComponentItem<K>> values) {
+    private JButton getSearchButton(final String toolTipDesc, final String noValuesDesc, final List<? extends SwingComponentsItem<K>> values) {
         final JButton result = new JButton(new FlatSearchWithHistoryIcon(true));
         result.setToolTipText(StringUtils.isBlank(toolTipDesc) ? DEFAULT_SEARCH_TOOL_TIP_DESC : toolTipDesc);
         result.addActionListener(new SearchButtonActionListener(this, values, noValuesDesc));
@@ -78,7 +97,7 @@ public class PlaceholderSearchTextField<T extends ComponentItem<K>, K> extends P
         private final JTextComponent textComponent;
 
         // Source values
-        private final List<? extends ComponentItem<K>> values;
+        private final List<? extends SwingComponentsItem<K>> values;
 
         // Configuration
         private final String noValuesDesc;
@@ -109,7 +128,7 @@ public class PlaceholderSearchTextField<T extends ComponentItem<K>, K> extends P
     }
 
     @Getter
-    private static class SelectedItemListener<T extends ComponentItem<K>, K> implements DocumentListener {
+    private static class SelectedItemListener<T extends SwingComponentsItem<K>, K> implements DocumentListener {
 
         // Data
         private final List<T> values;
@@ -158,8 +177,7 @@ public class PlaceholderSearchTextField<T extends ComponentItem<K>, K> extends P
 
             // Search item
             else if (CollectionUtils.isNotEmpty(this.values)) {
-                final Optional<T> maySelectedItem = this.values.stream().filter(v -> v.toTextField().equals(textValue))
-                        .findFirst();
+                final Optional<T> maySelectedItem = this.values.stream().filter(v -> v.toTextField().equals(textValue)).findFirst();
 
                 if (maySelectedItem.isPresent()) {
                     this.selectedItem = maySelectedItem.get();

@@ -1,4 +1,4 @@
-package io.github.squdan.swing.components;
+package io.github.squdan.swing.components.util.customize;
 
 import com.formdev.flatlaf.ui.FlatButtonBorder;
 
@@ -7,14 +7,13 @@ import java.io.Serial;
 
 /**
  * This class allows to change button border color which is protected at
- * FlatButtonBorder and can't be accesed directly.
+ * FlatButtonBorder and can't be accessed directly.
  * 
  * @author Daniel Torres Rojano
  *
  */
 public class CustomButtonBorder extends FlatButtonBorder {
 
-	/** Generated Serial Version UID */
 	@Serial
 	private static final long serialVersionUID = 6666785477446930321L;
 

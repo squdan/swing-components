@@ -5,6 +5,9 @@ import io.github.squdan.swing.components.SwingComponentsException;
 
 import java.util.Objects;
 
+/**
+ * Swing-Components library configuration class.
+ */
 public class SwingComponents {
 
     private static SwingComponentsConfiguration configuration;

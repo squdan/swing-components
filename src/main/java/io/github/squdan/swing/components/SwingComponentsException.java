@@ -1,7 +1,7 @@
 package io.github.squdan.swing.components;
 
 /**
- * QueryDslFilter context exception.
+ * Swing-Components exception.
  */
 public class SwingComponentsException extends RuntimeException {
 

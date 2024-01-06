@@ -1,7 +1,10 @@
 package io.github.squdan.swing.components.table;
 
-import io.github.squdan.swing.components.SwingView;
+import io.github.squdan.swing.components.SwingComponentsView;
 import io.github.squdan.swing.components.configuration.SwingComponents;
+import io.github.squdan.swing.components.table.action.TableActions;
+import io.github.squdan.swing.components.table.model.ColumnInfo;
+import io.github.squdan.swing.components.table.model.GenericTableModel;
 import io.github.squdan.swing.components.text.FilterTextField;
 import io.github.squdan.swing.components.util.ViewUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -20,24 +23,37 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+/**
+ * Table representation using {@link JPanel}.
+ * <p>
+ * This implementation will show a table using received source information from {@link GenericTableModel} implementation,
+ * which contains elements to show in the table and column information. This component will offer some on-click action
+ * if they are implemented at received {@link TableActions} implementation.
+ */
 public class TablePanel<T, K extends GenericTableModel<T>> extends JPanel {
 
-    /**
-     * Generated Serial Version UID
-     */
     @Serial
     private static final long serialVersionUID = 8438204457927336847L;
 
     // Table state
-    private final SwingView origin;
+    private final SwingComponentsView origin;
     private final JTable table;
     private final K tableModel;
     private final TableActions<T> tableActions;
     private int selectedRow;
     private int selectedColumn;
 
-    public TablePanel(final SwingView origin, final String title, final K tableModel, final TableActions<T> tableActions,
-                      final Boolean addFilters) {
+    /**
+     * Constructor to configure table requirements.
+     *
+     * @param origin:        current view to refresh when some action is executed.
+     * @param title:         title to show in the table.
+     * @param tableModel:    source elements information.
+     * @param tableActions:  available user actions over table and cells.
+     * @param enableFilters: if true, filter and sorting will be enabled.
+     */
+    public TablePanel(final SwingComponentsView origin, final String title, final K tableModel, final TableActions<T> tableActions,
+                      final Boolean enableFilters) {
         super(new GridLayout(1, 1));
         this.origin = origin;
         this.tableModel = tableModel;
@@ -48,18 +64,18 @@ public class TablePanel<T, K extends GenericTableModel<T>> extends JPanel {
         final JComponent tableContainer = new JScrollPane(table);
 
         // Adds table actions
-        table.setComponentPopupMenu(tableActions.getAvailableTableActions());
-        tableContainer.setComponentPopupMenu(tableActions.getAvailableGlobalActions());
+        table.setComponentPopupMenu(tableActions.getAvailableCellActions());
+        tableContainer.setComponentPopupMenu(tableActions.getAvailableTableActions());
 
         // Register action listeners
         table.addMouseListener(new SelectCellMouseListener());
-        Stream.of(tableActions.getAvailableTableActions().getComponents()).map(c -> (JMenuItem) c)
+        Stream.of(tableActions.getAvailableCellActions().getComponents()).map(c -> (JMenuItem) c)
                 .forEach(c -> c.addActionListener(new OpenPopupDayActionListener()));
-        Stream.of(tableActions.getAvailableGlobalActions().getComponents()).map(c -> (JMenuItem) c)
+        Stream.of(tableActions.getAvailableTableActions().getComponents()).map(c -> (JMenuItem) c)
                 .forEach(c -> c.addActionListener(new OpenPopupDayActionListener()));
 
         // Generate filters
-        if (BooleanUtils.isTrue(addFilters)) {
+        if (BooleanUtils.isTrue(enableFilters)) {
             final List<FilterTextField<K>> filters = configureTableFilters(tableModel, table);
 
             // Panel configuration

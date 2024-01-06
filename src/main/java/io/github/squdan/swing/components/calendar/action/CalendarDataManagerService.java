@@ -1,10 +1,11 @@
-package io.github.squdan.swing.components.calendar;
+package io.github.squdan.swing.components.calendar.action;
 
+import io.github.squdan.swing.components.calendar.CalendarDataProviderService;
 import io.github.squdan.swing.components.calendar.cell.CalendarDayCell;
 
 /**
  * Interface to define service actions to use into {@link CalendarDayActions} that will be offered in each cell
- * with mouse right click.
+ * from {@link io.github.squdan.swing.components.calendar.CalendarPanel} with mouse right click.
  */
 public interface CalendarDataManagerService extends CalendarDataProviderService {
 

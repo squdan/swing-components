@@ -15,11 +15,14 @@ import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Objects;
 
+/**
+ * Datepicker representation using {@link JPanel}.
+ * <p>
+ * This implementation will show a non-editable text field with selected date and a button to open the calendar
+ * to choose a new one.
+ */
 public class DatePickerMinimizedPanel extends JPanel {
 
-    /**
-     * Generated Serial Version UID
-     */
     @Serial
     private static final long serialVersionUID = -9022651370346477492L;
 

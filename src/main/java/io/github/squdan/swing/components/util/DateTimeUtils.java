@@ -11,6 +11,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
+/**
+ * Utility class to manage dates.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DateTimeUtils {
 

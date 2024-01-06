@@ -1,5 +1,6 @@
-package io.github.squdan.swing.components.calendar;
+package io.github.squdan.swing.components.calendar.action;
 
+import io.github.squdan.swing.components.calendar.CalendarPanel;
 import io.github.squdan.swing.components.calendar.cell.CalendarDayCell;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,6 +24,7 @@ public class CalendarDayActions {
 
     /**
      * Constructor that enables default actions:
+     * <p>
      * - See: uses {@link CalendarDataManagerService} see method.
      * - Create: uses {@link CalendarDataManagerService} create method.
      * - Delete: uses {@link CalendarDataManagerService} delete method.
@@ -41,7 +43,7 @@ public class CalendarDayActions {
      *
      * @param service: {@link CalendarDataManagerService} implementation.
      */
-    public CalendarDayActions(final CalendarDataManagerService service, final boolean useDefaultActions) {
+    protected CalendarDayActions(final CalendarDataManagerService service, final boolean useDefaultActions) {
         this.service = service;
 
         if (useDefaultActions) {
