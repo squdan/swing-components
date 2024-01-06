@@ -74,6 +74,7 @@ public class ExampleApplication {
         JDialog.setDefaultLookAndFeelDecorated(true);
 
         // SwingComponents dependency configuration
+        SwingComponents.initFlatLaf();
         SwingComponents.setup(SwingComponentsConfiguration.builder()
                 .textConfiguration(SwingComponentsConfiguration.SwingComponentsTextConfiguration.builder()
                         .titleFont(FlatLafFontTitles.FONT_TITLE_1.getFont())
