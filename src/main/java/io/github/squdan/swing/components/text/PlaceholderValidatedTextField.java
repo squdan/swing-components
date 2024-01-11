@@ -80,8 +80,8 @@ public class PlaceholderValidatedTextField extends PlaceholderTextField {
         @AllArgsConstructor
         public enum CommonRestrictions {
             DNI_NIE_NIF(TextFieldRestrictions.builder()
-                    .minLenght(5)
-                    .maxLenght(200)
+                    .minLenght(9)
+                    .maxLenght(9)
                     .regex(TextFieldRestrictions.CommonRegexs.DNI_NIE_NIF_FORMAT.getRegex())
                     .build()),
             EMAIL(TextFieldRestrictions.builder()
@@ -121,8 +121,8 @@ public class PlaceholderValidatedTextField extends PlaceholderTextField {
             EMAIL_FORMAT("([\\w.+-]+)\\@(\\w+)\\.(\\w+)"),
             PHONE_FORMAT("([\\d{9}]+)"),
             INTEGER_ALLOWED_CHARACTERS("([\\d])"),
-            DECIMAL_ALLOWED_CHARACTERS("[\\d.]"),
-            DECIMAL_FORMAT("([\\d]+)([\\d.]*)");
+            DECIMAL_ALLOWED_CHARACTERS("[\\d,]"),
+            DECIMAL_FORMAT("([\\d]+)([\\d,]*)");
 
             private final String regex;
         }
@@ -194,7 +194,7 @@ public class PlaceholderValidatedTextField extends PlaceholderTextField {
 
         private void changeFieldStatus(final boolean valid) {
             if (valid) {
-                this.textField.setBackground(SwingComponents.getConfiguration().getColorConfiguration().getSuccess());
+                this.textField.setBackground(SwingComponents.getConfiguration().getColorConfiguration().getNeutral());
             } else {
                 this.textField.setBackground(SwingComponents.getConfiguration().getColorConfiguration().getDanger());
             }

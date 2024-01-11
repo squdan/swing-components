@@ -45,6 +45,8 @@ public class SwingComponentsConfiguration {
     public static class SwingComponentsColorConfiguration {
 
         // Main configuration
+        private Color neutral;
+
         private Color primary;
         private Color primaryText;
 
