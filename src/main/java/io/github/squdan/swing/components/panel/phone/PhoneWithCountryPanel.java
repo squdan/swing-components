@@ -1,6 +1,6 @@
 package io.github.squdan.swing.components.panel.phone;
 
-import io.github.squdan.swing.components.text.PlaceholderTextField;
+import io.github.squdan.swing.components.text.PlaceholderValidatedTextField;
 import io.github.squdan.swing.components.util.ViewUtils;
 
 import javax.swing.*;
@@ -57,11 +57,15 @@ public class PhoneWithCountryPanel extends JPanel {
 
         if (Objects.nonNull(phone)) {
             // Fill PhoneTextField fields
-            this.phoneTextField = new PlaceholderTextField(placeholder, phone.getNumber().toString());
+            this.phoneTextField = new PlaceholderValidatedTextField(
+                    PlaceholderValidatedTextField.TextFieldRestrictions.CommonRestrictions.PHONE_FORMAT.getRestrictions(),
+                    placeholder, phone.getNumber().toString());
             this.countryComboBox.setSelectedItem(phone.getCountry());
         } else {
             // Fill PhoneTextField fields
-            this.phoneTextField = new PlaceholderTextField(placeholder, null);
+            this.phoneTextField = new PlaceholderValidatedTextField(
+                    PlaceholderValidatedTextField.TextFieldRestrictions.CommonRestrictions.PHONE_FORMAT.getRestrictions(),
+                    placeholder);
             this.countryComboBox.setSelectedItem(defaultCountry);
         }
 

@@ -1,6 +1,6 @@
 package io.github.squdan.swing.components.panel.calendar.cell;
 
-import io.github.squdan.swing.components.panel.calendar.CalendarUtils;
+import io.github.squdan.swing.components.panel.calendar.SwingComponentsDateTimeUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CalendarDayTime {
+public class DayTime {
 
     private int hour;
     private int minutes;
 
     @Override
     public String toString() {
-        return CalendarUtils.getTimeFormatted(hour, minutes);
+        return SwingComponentsDateTimeUtils.getTimeFormatted(hour, minutes);
     }
 }

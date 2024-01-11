@@ -1,6 +1,6 @@
 package io.github.squdan.swing.components.panel.calendar.cell;
 
-import io.github.squdan.swing.components.panel.calendar.CalendarUtils;
+import io.github.squdan.swing.components.panel.calendar.SwingComponentsDateTimeUtils;
 import io.github.squdan.swing.components.panel.calendar.CalendarPanel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,7 +41,7 @@ public class CalendarDayCell {
     }
 
     public Instant getInstantUtc() {
-        return CalendarUtils.getInstantUtcFrom(year, month, day);
+        return SwingComponentsDateTimeUtils.getInstantUtcFrom(year, month, day);
     }
 
     public LocalDate getLocalDate() {
@@ -49,7 +49,7 @@ public class CalendarDayCell {
     }
 
     public String getDateAsString() {
-        return CalendarUtils.getDateFormatted(year, month, day);
+        return SwingComponentsDateTimeUtils.getDateFormatted(year, month, day);
     }
 
     public String getAppointmentsTimeAsString() {

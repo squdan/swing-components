@@ -1,6 +1,6 @@
 package io.github.squdan.swing.components.panel.calendar;
 
-import io.github.squdan.swing.components.panel.calendar.cell.CalendarDayTime;
+import io.github.squdan.swing.components.panel.calendar.cell.DayTime;
 import io.github.squdan.swing.components.util.DateTimeUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -11,10 +11,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 /**
- * Calendar utilities.
+ * Date-time utilities.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class CalendarUtils {
+public final class SwingComponentsDateTimeUtils {
 
     // Configuration
     private static final String DATE_SEPARATOR = "/";
@@ -31,14 +31,14 @@ public final class CalendarUtils {
     }
 
     /**
-     * Return {@link CalendarDayTime} from received instant.
+     * Return {@link DayTime} from received instant.
      *
      * @param date to obtain time from.
-     * @return {@link CalendarDayTime} from received instant.
+     * @return {@link DayTime} from received instant.
      */
-    public static CalendarDayTime getCalendarDayTimeFrom(final Instant date) {
+    public static DayTime getDayTimeFrom(final Instant date) {
         final ZonedDateTime dateZoned = DateTimeUtils.InstantUtils.getZonedDateTimeAtMadridZone(date);
-        return CalendarDayTime.builder().hour(dateZoned.getHour()).minutes(dateZoned.getMinute()).build();
+        return DayTime.builder().hour(dateZoned.getHour()).minutes(dateZoned.getMinute()).build();
     }
 
     /**
@@ -54,7 +54,7 @@ public final class CalendarUtils {
     }
 
     /**
-     * Parses received date information to Instant.
+     * Parses received date information to Instant with time 00:00.
      *
      * @param year  to use in the conversion.
      * @param month to use in the conversion.

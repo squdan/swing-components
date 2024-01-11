@@ -86,19 +86,16 @@ public class TableFilterListener<T extends AbstractTableModel> implements Docume
 
             // Clean other filters
             if (CollectionUtils.isNotEmpty(filtersToClean)) {
-                filtersToClean.stream().forEach(of -> clearOrderToFilter(of));
+                filtersToClean.forEach(this::clearOrderToFilter);
             }
         }
     }
 
     private void clearOrderToFilter(final FilterTextField<T> filter) {
-        final Runnable clearFilter = new Runnable() {
-            @Override
-            public void run() {
-                filter.getDocument().removeDocumentListener(filter.getFilterListener());
-                filter.setText(StringUtils.EMPTY);
-                filter.getDocument().addDocumentListener(filter.getFilterListener());
-            }
+        final Runnable clearFilter = () -> {
+            filter.getDocument().removeDocumentListener(filter.getFilterListener());
+            filter.setText(StringUtils.EMPTY);
+            filter.getDocument().addDocumentListener(filter.getFilterListener());
         };
 
         SwingUtilities.invokeLater(clearFilter);
