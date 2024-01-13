@@ -3,6 +3,7 @@ package io.github.squdan.swing.components.panel.table;
 import io.github.squdan.swing.components.SwingComponentsView;
 import io.github.squdan.swing.components.configuration.SwingComponents;
 import io.github.squdan.swing.components.panel.table.action.TableActions;
+import io.github.squdan.swing.components.panel.table.cell.SwingComponentsTableCellRenderer;
 import io.github.squdan.swing.components.panel.table.model.ColumnInfo;
 import io.github.squdan.swing.components.panel.table.model.GenericTableModel;
 import io.github.squdan.swing.components.panel.table.model.FilterTextField;
@@ -99,7 +100,7 @@ public class TablePanel<T, K extends GenericTableModel<T>> extends JPanel {
         result.getTableHeader().setReorderingAllowed(false);
 
         // Apply center align to each column
-        final DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        final SwingComponentsTableCellRenderer centerRenderer = new SwingComponentsTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         IntStream.range(0, result.getColumnCount())
                 .forEach(i -> result.getColumnModel().getColumn(i).setCellRenderer(centerRenderer));

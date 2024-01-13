@@ -1,5 +1,7 @@
 package io.github.squdan.swing.components;
 
+import java.awt.*;
+
 /**
  * Interface that defines required information for component items.
  *
@@ -20,4 +22,13 @@ public interface SwingComponentsItem<T> {
      * @return String representation.
      */
     String toTextField();
+
+    /**
+     * Return representation color.
+     *
+     * @return Color.
+     */
+    default Color getColor() {
+        return null;
+    }
 }

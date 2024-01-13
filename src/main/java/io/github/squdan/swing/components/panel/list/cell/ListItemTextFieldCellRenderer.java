@@ -33,25 +33,39 @@ public class ListItemTextFieldCellRenderer extends DefaultListCellRenderer {
 
         if (Objects.nonNull(value)) {
             result = new JButton();
+
+            // Text configuration
             result.setForeground(SwingComponents.getConfiguration().getColorConfiguration().getPrimaryText());
             result.setFont(SwingComponents.getConfiguration().getTextConfiguration().getTitleSecondaryFont());
 
-            if (value instanceof SwingComponentsItem<?>) {
-                final SwingComponentsItem<?> valueCasted = (SwingComponentsItem<?>) value;
+            // Background color configuration
+            ViewUtils.changeButtonColorBackground(result, SwingComponents.getConfiguration().getColorConfiguration().getPrimary());
+
+            // Text content configuration
+            if (value instanceof SwingComponentsItem<?> valueCasted) {
                 result.setText(valueCasted.toTextField());
+
+                // If a color is configured for item, then change background
+                if (Objects.nonNull(valueCasted.getColor())) {
+                    ViewUtils.changeButtonColorBackground(result, valueCasted.getColor());
+                }
             } else {
                 result.setText(value.toString());
             }
 
-            // Set selection colors for cell
+            // Background color configuration for selected item
             if (isSelected) {
-                ViewUtils.changeButtonColorBackground(result, SwingComponents.getConfiguration().getColorConfiguration().getDanger());
-            } else {
-                ViewUtils.changeButtonColorBackground(result, SwingComponents.getConfiguration().getColorConfiguration().getPrimary());
+                ViewUtils.changeButtonColorBackground(result, selectedColor(result.getBackground()));
             }
         }
 
         return result;
     }
 
+    private static Color selectedColor(final Color color) {
+        int r = Math.min(255, color.getRed() + 70);
+        int g = Math.min(255, color.getGreen() + 70);
+        int b = Math.min(255, color.getBlue() + 70);
+        return new Color(r, g, b);
+    }
 }
