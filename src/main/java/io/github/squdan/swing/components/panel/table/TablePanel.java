@@ -5,13 +5,12 @@ import io.github.squdan.swing.components.configuration.SwingComponents;
 import io.github.squdan.swing.components.panel.table.action.TableActions;
 import io.github.squdan.swing.components.panel.table.cell.SwingComponentsTableCellRenderer;
 import io.github.squdan.swing.components.panel.table.model.ColumnInfo;
-import io.github.squdan.swing.components.panel.table.model.GenericTableModel;
 import io.github.squdan.swing.components.panel.table.model.FilterTextField;
+import io.github.squdan.swing.components.panel.table.model.GenericTableModel;
 import io.github.squdan.swing.components.util.ViewUtils;
 import org.apache.commons.lang3.BooleanUtils;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -21,6 +20,7 @@ import java.awt.event.MouseEvent;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -65,15 +65,17 @@ public class TablePanel<T, K extends GenericTableModel<T>> extends JPanel {
         final JComponent tableContainer = new JScrollPane(table);
 
         // Adds table actions
-        table.setComponentPopupMenu(tableActions.getAvailableCellActions());
-        tableContainer.setComponentPopupMenu(tableActions.getAvailableTableActions());
+        if (Objects.nonNull(tableActions)) {
+            table.setComponentPopupMenu(tableActions.getAvailableCellActions());
+            tableContainer.setComponentPopupMenu(tableActions.getAvailableTableActions());
 
-        // Register action listeners
-        table.addMouseListener(new SelectCellMouseListener());
-        Stream.of(tableActions.getAvailableCellActions().getComponents()).map(c -> (JMenuItem) c)
-                .forEach(c -> c.addActionListener(new OpenPopupDayActionListener()));
-        Stream.of(tableActions.getAvailableTableActions().getComponents()).map(c -> (JMenuItem) c)
-                .forEach(c -> c.addActionListener(new OpenPopupDayActionListener()));
+            // Register action listeners
+            table.addMouseListener(new SelectCellMouseListener());
+            Stream.of(tableActions.getAvailableCellActions().getComponents()).map(c -> (JMenuItem) c)
+                    .forEach(c -> c.addActionListener(new OpenPopupDayActionListener()));
+            Stream.of(tableActions.getAvailableTableActions().getComponents()).map(c -> (JMenuItem) c)
+                    .forEach(c -> c.addActionListener(new OpenPopupDayActionListener()));
+        }
 
         // Generate filters
         if (BooleanUtils.isTrue(enableFilters)) {

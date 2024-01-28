@@ -1,6 +1,5 @@
 package io.github.squdan.swing.components.panel.table.model;
 
-import io.github.squdan.swing.components.SwingComponentsItem;
 import io.github.squdan.swing.components.panel.table.TablePanel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -50,7 +49,11 @@ public class GenericTableModel<T> extends AbstractTableModel {
     }
 
     public void setData(final List<T> source) {
-        this.values = new ArrayList<>(source);
+        if (Objects.isNull(source)) {
+            this.values = new ArrayList<>();
+        } else {
+            this.values = new ArrayList<>(source);
+        }
     }
 
     public void addData(final T source) {
