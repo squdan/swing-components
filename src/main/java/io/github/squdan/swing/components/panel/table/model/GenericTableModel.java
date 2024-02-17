@@ -96,19 +96,51 @@ public class GenericTableModel<T> extends AbstractTableModel {
         // Select value field
         final Object rowData = getValueAt(rowIndex);
         final String columnModelName = this.columns.get(columnIndex).getModelName();
+        final Object mayObjectValue = getFieldValueRecursive(rowData, columnModelName);
+
+        if (Objects.nonNull(mayObjectValue)) {
+            result = mayObjectValue;
+        } else {
+            log.error("Error al recuperar el valor de la columna '{} - {}'.", columnIndex, columnModelName);
+        }
+
+        return result;
+    }
+
+    private Object getFieldValueRecursive(final Object source, final String paramName) {
+        Object result = null;
+
+        if (Objects.nonNull(source) && StringUtils.isNotBlank(paramName)) {
+            final String[] paramNameComposed = paramName.split("\\.", 2);
+
+            if (StringUtils.isNotBlank(paramNameComposed[0])) {
+                result = getFieldValueWithReflection(source, paramNameComposed[0]);
+
+                if (paramNameComposed.length == 2) {
+                    final Object mayFieldSubobject = getFieldValueRecursive(result, paramNameComposed[1]);
+
+                    if (Objects.nonNull(mayFieldSubobject)) {
+                        result = mayFieldSubobject;
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private Object getFieldValueWithReflection(final Object source, final String paramName) {
+        Object result = null;
 
         try {
             // Recover column value from generic model
-            if (Objects.nonNull(rowData) && StringUtils.isNotBlank(columnModelName)) {
-                final Field columnField = rowData.getClass().getDeclaredField(columnModelName);
+            if (Objects.nonNull(source) && StringUtils.isNotBlank(paramName)) {
+                final Field columnField = source.getClass().getDeclaredField(paramName);
                 columnField.setAccessible(true);
-                result = columnField.get(rowData);
+                result = columnField.get(source);
             }
-        } catch (final NoSuchFieldException | SecurityException e) {
-            log.error("Error al recuperar la información de la columna '{} - {}'. Error: ", columnIndex,
-                    columnModelName, e);
-        } catch (final IllegalArgumentException | IllegalAccessException e) {
-            log.error("Error al recuperar el valor de la columna '{} - {}'. Error: ", columnIndex, columnModelName, e);
+        } catch (final NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            log.error("Error al recuperar la información del parámetro '{}'. Error: ", paramName, e);
         }
 
         return result;

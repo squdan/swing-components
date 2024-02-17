@@ -263,8 +263,8 @@ public class CalendarPanel extends JPanel {
             } else {
                 // Decrease one month
                 selectedMonth -= 1;
-                refresh();
             }
+            refresh();
         }
     }
 
@@ -278,8 +278,8 @@ public class CalendarPanel extends JPanel {
             } else {
                 // Increase one month
                 selectedMonth += 1;
-                refresh();
             }
+            refresh();
         }
     }
 
@@ -309,6 +309,7 @@ public class CalendarPanel extends JPanel {
                         selectedColumn);
             } catch (final Exception ex) {
                 log.error("Error gestionando evento del calendario. Error: {}", e);
+                JOptionPane.showMessageDialog(null, "Error al realizar la acción.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
