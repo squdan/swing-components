@@ -3,7 +3,7 @@ package io.github.squdan.swing.components;
 /**
  * Interface to define required methods to implement from origin context using some components.
  */
-public interface SwingComponentsView {
+public interface SwingComponentsView<T> {
 
     /**
      * Refresh current view.
@@ -14,5 +14,5 @@ public interface SwingComponentsView {
      * - Updating showing information.
      * - Repainting if necessary.
      */
-    void refresh();
+    void refresh(T data);
 }

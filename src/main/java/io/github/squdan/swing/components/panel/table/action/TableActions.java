@@ -78,9 +78,10 @@ public class TableActions<T> {
      * @param columnInfo {@link ColumnInfo} from selected cell from user.
      * @param row        from selected cell from user.
      * @param column     from selected cell from user.
+     * @return true if refresh needed.
      */
-    public void manageActionEvents(final Object source, final String command, final T cellValue, final Object columnInfo,
-                                   final int row, final int column) {
+    public boolean manageActionEvents(final Object source, final String command, final T cellValue, final Object columnInfo,
+                                      final int row, final int column) {
         if (globalActionNew == source) {
             service.create(command, cellValue, columnInfo);
         } else if (tableActionSee == source) {
@@ -95,6 +96,8 @@ public class TableActions<T> {
             log.warn("Acción desconocida sobre la fila '{}' en el elemento '{}' en fila '{}' y columna '{}'", cellValue,
                     columnInfo, row, column);
         }
+
+        return true;
     }
 
     /**

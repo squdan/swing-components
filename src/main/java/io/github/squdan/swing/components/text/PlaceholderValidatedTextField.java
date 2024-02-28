@@ -105,6 +105,10 @@ public class PlaceholderValidatedTextField extends PlaceholderTextField {
                     .maxLenght(200)
                     .allowedCharactersRegex(TextFieldRestrictions.CommonRegexs.DECIMAL_ALLOWED_CHARACTERS.getRegex())
                     .regex(TextFieldRestrictions.CommonRegexs.DECIMAL_FORMAT.getRegex())
+                    .build()),
+            NOT_EMPTY(TextFieldRestrictions.builder()
+                    .minLenght(1)
+                    .maxLenght(200)
                     .build());
 
             private final TextFieldRestrictions restrictions;

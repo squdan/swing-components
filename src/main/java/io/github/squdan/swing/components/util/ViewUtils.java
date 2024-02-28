@@ -228,34 +228,10 @@ public final class ViewUtils {
 
     public static JPanel generateHorizontalPanelSmallBig(final JComponent infoComponent,
                                                          final JComponent actionComponent) {
-        final JPanel result = new JPanel(new GridBagLayout());
-
-        // Panel info configuration
-        final GridBagConstraints smallConstraints = new GridBagConstraints();
-        smallConstraints.fill = GridBagConstraints.VERTICAL;
-        smallConstraints.ipadx = 0; // Margin between components
-        smallConstraints.ipady = 0; // Margin between components
-        smallConstraints.gridwidth = 2; // Cells number taken by component
-        smallConstraints.gridheight = 1; // Cells number taken by component
-        smallConstraints.weightx = 0.0; // To take extra space without use
-        smallConstraints.weighty = 0.0; // To take extra space without use
-        smallConstraints.gridx = 0; // Position X
-        smallConstraints.gridy = 0; // Position Y
-        result.add(infoComponent, smallConstraints);
-
-        // Panel action configuration
-        final GridBagConstraints bigConstraints = new GridBagConstraints();
-        bigConstraints.fill = GridBagConstraints.VERTICAL;
-        bigConstraints.ipadx = 100; // Margin between components
-        bigConstraints.ipady = 0; // Margin between components
-        bigConstraints.gridwidth = 8; // Cells number taken by component
-        bigConstraints.gridheight = 1; // Cells number taken by component
-        bigConstraints.weightx = 1.0; // To take extra space without use
-        bigConstraints.weighty = 1.0; // To take extra space without use
-        bigConstraints.gridx = 2; // Position X
-        bigConstraints.gridy = 0; // Position Y
-        result.add(actionComponent, bigConstraints);
-
+        final JPanel result = new JPanel();
+        result.setLayout(new BoxLayout(result, BoxLayout.X_AXIS));
+        result.add(infoComponent);
+        result.add(actionComponent);
         return result;
     }
 }

@@ -17,10 +17,11 @@ public class CalendarDayActions {
     private final CalendarDataManagerService service;
 
     // Components
-    private final JPopupMenu actionsMenu = new JPopupMenu();
-    private final JMenuItem actionItemSee = new JMenuItem("Ver");
-    private final JMenuItem actionItemAdd = new JMenuItem("Añadir");
-    private final JMenuItem actionItemDelete = new JMenuItem("Eliminar");
+    protected final JPopupMenu actionsMenu = new JPopupMenu();
+    protected final JMenuItem actionItemSee = new JMenuItem("Ver");
+    protected final JMenuItem actionItemAdd = new JMenuItem("Añadir");
+    protected final JMenuItem actionItemUpdate = new JMenuItem("Actualizar");
+    protected final JMenuItem actionItemDelete = new JMenuItem("Eliminar");
 
     /**
      * Constructor that enables default actions:

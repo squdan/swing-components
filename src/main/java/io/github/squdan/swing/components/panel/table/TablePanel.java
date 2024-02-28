@@ -8,6 +8,8 @@ import io.github.squdan.swing.components.panel.table.model.ColumnInfo;
 import io.github.squdan.swing.components.panel.table.model.FilterTextField;
 import io.github.squdan.swing.components.panel.table.model.GenericTableModel;
 import io.github.squdan.swing.components.util.ViewUtils;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 
 import javax.swing.*;
@@ -31,13 +33,14 @@ import java.util.stream.Stream;
  * which contains elements to show in the table and column information. This component will offer some on-click action
  * if they are implemented at received {@link TableActions} implementation.
  */
-public class TablePanel<T, K extends GenericTableModel<T>> extends JPanel {
+@Slf4j
+public class TablePanel<Z, T, K extends GenericTableModel<T>> extends JPanel {
 
     @Serial
     private static final long serialVersionUID = 8438204457927336847L;
 
     // Table state
-    private final SwingComponentsView origin;
+    private final SwingComponentsView<Z> origin;
     private final JTable table;
     private final K tableModel;
     private final TableActions<T> tableActions;
@@ -48,12 +51,13 @@ public class TablePanel<T, K extends GenericTableModel<T>> extends JPanel {
      * Constructor to configure table requirements.
      *
      * @param origin:        current view to refresh when some action is executed.
+     * @param originInput:   current view input data to refresh when some action is executed.
      * @param title:         title to show in the table.
      * @param tableModel:    source elements information.
      * @param tableActions:  available user actions over table and cells.
      * @param enableFilters: if true, filter and sorting will be enabled.
      */
-    public TablePanel(final SwingComponentsView origin, final String title, final K tableModel, final TableActions<T> tableActions,
+    public TablePanel(final SwingComponentsView<Z> origin, final Z originInput, final String title, final K tableModel, final TableActions<T> tableActions,
                       final Boolean enableFilters) {
         super(new GridLayout(1, 1));
         this.origin = origin;
@@ -72,9 +76,9 @@ public class TablePanel<T, K extends GenericTableModel<T>> extends JPanel {
             // Register action listeners
             table.addMouseListener(new SelectCellMouseListener());
             Stream.of(tableActions.getAvailableCellActions().getComponents()).map(c -> (JMenuItem) c)
-                    .forEach(c -> c.addActionListener(new OpenPopupDayActionListener()));
+                    .forEach(c -> c.addActionListener(new OpenPopupDayActionListener(originInput)));
             Stream.of(tableActions.getAvailableTableActions().getComponents()).map(c -> (JMenuItem) c)
-                    .forEach(c -> c.addActionListener(new OpenPopupDayActionListener()));
+                    .forEach(c -> c.addActionListener(new OpenPopupDayActionListener(originInput)));
         }
 
         // Generate filters
@@ -137,17 +141,23 @@ public class TablePanel<T, K extends GenericTableModel<T>> extends JPanel {
         return filters;
     }
 
+    @AllArgsConstructor
     private class OpenPopupDayActionListener implements ActionListener {
+        private Z originInput;
+
         @SuppressWarnings("unchecked")
         public void actionPerformed(ActionEvent e) {
             try {
                 final Object cellValue = tableModel.getValueAt(selectedRow, selectedColumn);
                 final Object rowValue = tableModel.getValueAt(selectedRow);
-                tableActions.manageActionEvents(e.getSource(), e.getActionCommand(), (T) rowValue, cellValue,
+                final boolean refresh = tableActions.manageActionEvents(e.getSource(), e.getActionCommand(), (T) rowValue, cellValue,
                         selectedRow, selectedColumn);
-                origin.refresh();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+
+                if (refresh && Objects.nonNull(origin)) {
+                    origin.refresh(originInput);
+                }
+            } catch (final Exception ex) {
+                log.error("Error gestionando eventos de la tabla. Error: {}", e);
             }
         }
     }
