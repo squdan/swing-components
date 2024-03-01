@@ -26,6 +26,9 @@ public class PlaceholderValidatedTextField extends PlaceholderTextField {
     // Configuration
     private final static String ALLOWED_NIE_CHARACTERS = "TRWAGMYFPDXBNJZSQVHLCKE";
 
+    // Data
+    private final TextFieldInputValidator validator;
+
     /**
      * Constructor without placeholder, just apply restrictions and validations.
      *
@@ -58,18 +61,29 @@ public class PlaceholderValidatedTextField extends PlaceholderTextField {
         super(placeholder, value);
 
         // Set validator
-        final TextFieldInputValidator validator = new TextFieldInputValidator(this, restrictions);
+        this.validator = new TextFieldInputValidator(this, restrictions);
         ((AbstractDocument) this.getDocument()).setDocumentFilter(validator);
 
         // Update validation status field
         if (Objects.nonNull(value)) {
-            validator.validateFieldValue();
+            this.validator.validateFieldValue();
         }
+    }
+
+    public boolean isValid() {
+        boolean result = super.isValid();
+
+        if (Objects.nonNull(this.validator)) {
+            result = result && this.validator.validateFieldValue();
+        }
+
+        return result;
     }
 
     @Getter
     @Builder
     public static class TextFieldRestrictions {
+        private boolean allowEmpty;
         private Boolean numeric;
         private Integer minLenght;
         private Integer maxLenght;
@@ -80,27 +94,32 @@ public class PlaceholderValidatedTextField extends PlaceholderTextField {
         @AllArgsConstructor
         public enum CommonRestrictions {
             DNI_NIE_NIF(TextFieldRestrictions.builder()
+                    .allowEmpty(true)
                     .minLenght(9)
                     .maxLenght(9)
                     .regex(TextFieldRestrictions.CommonRegexs.DNI_NIE_NIF_FORMAT.getRegex())
                     .build()),
             EMAIL(TextFieldRestrictions.builder()
+                    .allowEmpty(true)
                     .minLenght(5)
                     .maxLenght(200)
                     .regex(TextFieldRestrictions.CommonRegexs.EMAIL_FORMAT.getRegex())
                     .build()),
             PHONE_FORMAT(TextFieldRestrictions.builder()
+                    .allowEmpty(true)
                     .minLenght(9)
                     .maxLenght(9)
                     .allowedCharactersRegex(TextFieldRestrictions.CommonRegexs.INTEGER_ALLOWED_CHARACTERS.getRegex())
                     .regex(TextFieldRestrictions.CommonRegexs.PHONE_FORMAT.getRegex())
                     .build()),
             INTEGER(TextFieldRestrictions.builder()
+                    .allowEmpty(true)
                     .minLenght(1)
                     .maxLenght(200)
                     .allowedCharactersRegex(TextFieldRestrictions.CommonRegexs.INTEGER_ALLOWED_CHARACTERS.getRegex())
                     .build()),
             DECIMAL(TextFieldRestrictions.builder()
+                    .allowEmpty(true)
                     .minLenght(1)
                     .maxLenght(200)
                     .allowedCharactersRegex(TextFieldRestrictions.CommonRegexs.DECIMAL_ALLOWED_CHARACTERS.getRegex())
@@ -124,9 +143,9 @@ public class PlaceholderValidatedTextField extends PlaceholderTextField {
                     ALLOWED_NIE_CHARACTERS.toLowerCase(), ALLOWED_NIE_CHARACTERS)),
             EMAIL_FORMAT("([\\w.+-]+)\\@(\\w+)\\.(\\w+)"),
             PHONE_FORMAT("([\\d{9}]+)"),
-            INTEGER_ALLOWED_CHARACTERS("([\\d])"),
-            DECIMAL_ALLOWED_CHARACTERS("[\\d,]"),
-            DECIMAL_FORMAT("([\\d]+)([\\d,]*)");
+            INTEGER_ALLOWED_CHARACTERS("[\\d]*"),
+            DECIMAL_ALLOWED_CHARACTERS("[\\d,.]*"),
+            DECIMAL_FORMAT("([\\d])+([,.]{1}[\\d]+)?");
 
             private final String regex;
         }
@@ -164,33 +183,49 @@ public class PlaceholderValidatedTextField extends PlaceholderTextField {
             validateFieldValue();
         }
 
-        public void validateFieldValue() {
+        public boolean validateFieldValue() {
             boolean valid = true;
 
-            if (Objects.nonNull(this.restrictions.getMinLenght()) && this.textField.getText().length() < this.restrictions.getMinLenght()) {
-                valid = false;
+            // Empty input validation
+            if (StringUtils.isEmpty(this.textField.getText())) {
+                if (BooleanUtils.isFalse(this.restrictions.allowEmpty)) {
+                    valid = false;
+                }
             }
 
-            if (StringUtils.isNotBlank(this.restrictions.getRegex()) && !this.textField.getText().matches(this.restrictions.getRegex())) {
-                valid = false;
+            // Content input validation
+            else {
+                if (Objects.nonNull(this.restrictions.getMinLenght()) && this.textField.getText().length() < this.restrictions.getMinLenght()) {
+                    valid = false;
+                } else if (StringUtils.isNotBlank(this.restrictions.getRegex()) && !this.textField.getText().matches(this.restrictions.getRegex())) {
+                    valid = false;
+                }
             }
 
             changeFieldStatus(valid);
+
+            return valid;
         }
 
         private boolean validateInput(final int length, final String text) {
             boolean valid = true;
 
-            if (BooleanUtils.isTrue(this.restrictions.getNumeric()) && !text.matches("\\d+")) {
-                valid = false;
+            // Empty input validation
+            if (StringUtils.isEmpty(text)) {
+                if (BooleanUtils.isFalse(this.restrictions.allowEmpty)) {
+                    valid = false;
+                }
             }
 
-            if (Objects.nonNull(this.restrictions.getMaxLenght()) && (length + text.length() > this.restrictions.getMaxLenght())) {
-                valid = false;
-            }
-
-            if (StringUtils.isNotBlank(this.restrictions.getAllowedCharactersRegex()) && !text.matches(this.restrictions.getAllowedCharactersRegex())) {
-                valid = false;
+            // Content input validation
+            else {
+                if (BooleanUtils.isTrue(this.restrictions.getNumeric()) && !text.matches("\\d+")) {
+                    valid = false;
+                } else if (Objects.nonNull(this.restrictions.getMaxLenght()) && (length + text.length() > this.restrictions.getMaxLenght())) {
+                    valid = false;
+                } else if (StringUtils.isNotBlank(this.restrictions.getAllowedCharactersRegex()) && !text.matches(this.restrictions.getAllowedCharactersRegex())) {
+                    valid = false;
+                }
             }
 
             return valid;

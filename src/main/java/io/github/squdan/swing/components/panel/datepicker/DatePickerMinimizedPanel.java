@@ -67,8 +67,7 @@ public class DatePickerMinimizedPanel extends JPanel {
 
         // Set selected day into the calendar
         if (Objects.nonNull(selectedDate)) {
-            final LocalDate selectedLocalDate = DateTimeUtils.InstantUtils.getLocalDate(selectedDate);
-            datePicker.setDate(selectedLocalDate);
+            setSelectedDate(selectedDate);
         } else {
             datePicker.setDateToToday();
         }
@@ -84,6 +83,13 @@ public class DatePickerMinimizedPanel extends JPanel {
 
     public LocalDate getSelectedDate() {
         return datePicker.getDate();
+    }
+
+    public void setSelectedDate(final Instant selectedDate) {
+        if (Objects.nonNull(selectedDate)) {
+            final LocalDate selectedLocalDate = DateTimeUtils.InstantUtils.getLocalDate(selectedDate);
+            datePicker.setDate(selectedLocalDate);
+        }
     }
 
     private ImageIcon getButtonImage() {

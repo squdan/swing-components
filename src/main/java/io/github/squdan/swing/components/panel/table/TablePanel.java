@@ -157,7 +157,7 @@ public class TablePanel<Z, T, K extends GenericTableModel<T>> extends JPanel {
                     origin.refresh(originInput);
                 }
             } catch (final Exception ex) {
-                log.error("Error gestionando eventos de la tabla. Error: {}", e);
+                log.error("Error gestionando eventos de la tabla. Error: ", ex);
             }
         }
     }

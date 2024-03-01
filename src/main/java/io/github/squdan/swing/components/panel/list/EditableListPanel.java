@@ -154,6 +154,7 @@ public class EditableListPanel<T extends SwingComponentsItem<K>, K> extends JPan
                 if (Objects.nonNull(createdElement)) {
                     availableValues.add(createdElement);
                     availableElementsListModel.addElement(createdElement);
+                    selectedValues.add(createdElement);
                     searchAutocompleteTextField.setText(
                             availableElementsListModel.get(availableElementsListModel.size() - 1).toTextField());
                 }

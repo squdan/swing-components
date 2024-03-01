@@ -308,7 +308,7 @@ public class CalendarPanel extends JPanel {
                 actions.manageActionEvents(calendarInstance, e.getSource(), e.getActionCommand(), (CalendarDayCell) valor, selectedRow,
                         selectedColumn);
             } catch (final Exception ex) {
-                log.error("Error gestionando evento del calendario. Error: {}", e);
+                log.error("Error gestionando evento del calendario. Error: ", ex);
                 JOptionPane.showMessageDialog(null, "Error al realizar la acción.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
