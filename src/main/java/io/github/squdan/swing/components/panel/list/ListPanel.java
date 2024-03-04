@@ -27,9 +27,15 @@ public class ListPanel<T extends SwingComponentsItem<K>, K> extends JPanel {
     private static final long serialVersionUID = 5291140686384373317L;
 
     // Data
+    private final DefaultListModel<T> listModel = new DefaultListModel<>();
+    private final JList<T> jListElements;
+
     @Getter
-    private final List<T> selectedValues;
-    private final JList<T> availableElementsList;
+    private final List<T> listElemements;
+
+    public ListPanel(final JLabel header) {
+        this(header, null, null);
+    }
 
     public ListPanel(final List<T> values) {
         this(null, values, null);
@@ -43,27 +49,26 @@ public class ListPanel<T extends SwingComponentsItem<K>, K> extends JPanel {
         super(new GridLayout(0, 1));
 
         // Initializations
-        final DefaultListModel<T> availableElementsListModel = new DefaultListModel<>();
-        this.availableElementsList = new JList<>(availableElementsListModel);
-        this.selectedValues = values;
+        this.jListElements = new JList<>(listModel);
+        this.listElemements = values;
 
         // Configure elements list
-        this.availableElementsList.setCellRenderer(new ListItemTextFieldCellRenderer());
-        this.availableElementsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.jListElements.setCellRenderer(new ListItemTextFieldCellRenderer());
+        this.jListElements.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        if (CollectionUtils.isNotEmpty(this.selectedValues)) {
-            availableElementsListModel.addAll(this.selectedValues);
+        if (CollectionUtils.isNotEmpty(this.listElemements)) {
+            listModel.addAll(this.listElemements);
         }
 
         if (Objects.nonNull(managementService)) {
-            this.availableElementsList.addListSelectionListener(new SelectedElementListener(managementService));
+            this.jListElements.addListSelectionListener(new SelectedElementListener(managementService));
         } else {
-            this.availableElementsList.setSelectionModel(new ListModelNoSelection());
+            this.jListElements.setSelectionModel(new ListModelNoSelection());
         }
 
         // Configure panel
-        JPanel tagsPanel = new JPanel(new GridLayout(0, 1));
-        tagsPanel.add(new JScrollPane(availableElementsList));
+        final JPanel elementsPanel = new JPanel(new GridLayout(0, 1));
+        elementsPanel.add(new JScrollPane(jListElements));
 
         // Adds header to the panel
         if (Objects.nonNull(header)) {
@@ -75,13 +80,22 @@ public class ListPanel<T extends SwingComponentsItem<K>, K> extends JPanel {
             headerAlignPanel.add(header);
             resultPanel.add(headerAlignPanel);
 
-            resultPanel.add(tagsPanel);
+            resultPanel.add(elementsPanel);
             this.add(resultPanel);
         } else {
             final JPanel resultPanel = new JPanel(new GridLayout(0, 1));
-            resultPanel.add(tagsPanel);
+            resultPanel.add(elementsPanel);
             this.add(resultPanel);
         }
+    }
+
+    public void addValues(final List<T> values) {
+        this.listModel.addAll(values);
+    }
+
+    public void setValues(final List<T> values) {
+        this.listModel.clear();
+        this.listModel.addAll(values);
     }
 
     private class SelectedElementListener implements ListSelectionListener {
@@ -96,7 +110,7 @@ public class ListPanel<T extends SwingComponentsItem<K>, K> extends JPanel {
         @Override
         public void valueChanged(final ListSelectionEvent e) {
             // Draw popup
-            final T elementSelected = availableElementsList.getSelectedValue();
+            final T elementSelected = jListElements.getSelectedValue();
             if (Objects.nonNull(elementSelected)) {
                 this.managementService.action(elementSelected);
             }

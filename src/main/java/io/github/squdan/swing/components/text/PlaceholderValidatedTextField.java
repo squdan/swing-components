@@ -70,11 +70,11 @@ public class PlaceholderValidatedTextField extends PlaceholderTextField {
         }
     }
 
-    public boolean isValid() {
-        boolean result = super.isValid();
+    public boolean isContentValid() {
+        boolean result = true;
 
         if (Objects.nonNull(this.validator)) {
-            result = result && this.validator.validateFieldValue();
+            result = this.validator.validateFieldValue();
         }
 
         return result;
