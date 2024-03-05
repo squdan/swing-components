@@ -1,11 +1,10 @@
 package io.github.squdan.swing.components.panel.calendar;
 
+import io.github.squdan.swing.components.configuration.SwingComponents;
 import io.github.squdan.swing.components.panel.calendar.action.CalendarDataManagerService;
 import io.github.squdan.swing.components.panel.calendar.action.CalendarDayActions;
 import io.github.squdan.swing.components.panel.calendar.cell.CalendarDayCell;
 import io.github.squdan.swing.components.panel.calendar.cell.CalendarDayCellValue;
-import io.github.squdan.swing.components.panel.calendar.cell.renderer.CalendarDayCellRenderer;
-import io.github.squdan.swing.components.configuration.SwingComponents;
 import io.github.squdan.swing.components.util.ViewUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +28,7 @@ import java.util.stream.Stream;
  * Each day is represented with {@link CalendarDayCell} which contains custom information
  * when user implements {@link CalendarDayCellValue}.
  * <p>
- * Calendar information is loaded from {@link CalendarDataProviderService} service.
+ * Calendar information is loaded from {@link CalendarDataProviderService}.
  * <p>
  * Users can execute actions over cells using defined actions at {@link CalendarDayActions} which will execute methods
  * from {@link CalendarDataManagerService}.
@@ -69,10 +68,7 @@ public class CalendarPanel extends JPanel {
     private final JScrollPane calendarTableScrollPane = new JScrollPane(calendarTable);
 
     // APP state
-    private final JFrame window;
-    private final CalendarDayCellRenderer cellRenderer;
-    private final CalendarDataProviderService service;
-    private final CalendarDayActions actions;
+    private final CalendarConfiguration configuration;
 
     // Panel state
     private int currentYear;
@@ -85,33 +81,28 @@ public class CalendarPanel extends JPanel {
     /**
      * Constructor to configure calendar requirements.
      *
-     * @param window       current {@link JFrame} to calculate the table size.
-     * @param cellRenderer renderer to apply in each cell/day.
-     * @param service      to load calendar information.
-     * @param actions      available actions to execute in each cell by the user.
+     * @param configuration: required calendar configuration.
      */
-    public CalendarPanel(final JFrame window, final CalendarDayCellRenderer cellRenderer,
-                         final CalendarDataProviderService service, final CalendarDayActions actions) {
+    public CalendarPanel(final CalendarConfiguration configuration) {
         // Panel initialization
         super(new GridLayout(1, 1));
 
-        this.window = window;
-        this.cellRenderer = cellRenderer;
-        this.service = service;
-        this.actions = actions;
+        this.configuration = configuration;
 
         // Initialize calendar state
         setCurrentDate();
         setYearSelector();
-        configureCalendarTable(window, cellRenderer);
+        configureCalendarTable(configuration.getSourceFrame(), configuration.getCellRenderer());
 
         // Draw components
         this.add(ViewUtils.generateVerticalBigPanelMultipleHeaders(calendarTableScrollPane, prevButton, monthLabel,
                 changeYearButton, nextButton));
 
         // Register received actions - action listeners
-        Stream.of(actions.getAvailableActions().getComponents()).map(c -> (JMenuItem) c)
-                .forEach(c -> c.addActionListener(new OpenPopupDayActionListener(this)));
+        if (Objects.nonNull(configuration.getActions())) {
+            Stream.of(configuration.getActions().getAvailableActions().getComponents()).map(c -> (JMenuItem) c)
+                    .forEach(c -> c.addActionListener(new OpenPopupDayActionListener(this)));
+        }
 
         // Draw calendar
         refresh();
@@ -127,7 +118,7 @@ public class CalendarPanel extends JPanel {
      */
     public void refresh() {
         // Update row height by windows size
-        calendarTable.setRowHeight((int) Math.round(window.getWidth() / 17));
+        calendarTable.setRowHeight(Math.round((float) configuration.getSourceFrame().getWidth() / 17));
 
         // If user tries to go further than year limits, block the buttons
         if (selectedMonth == 0 && selectedYear <= currentYear - MAX_YEARS_ALLOWED) {
@@ -145,7 +136,7 @@ public class CalendarPanel extends JPanel {
         // Update selected month/year
         monthLabel.setText(MONTHS[selectedMonth]);
         changeYearButton.setSelectedItem(String.valueOf(selectedYear));
-        cellRenderer.updateSelectedDate(selectedMonth, selectedYear);
+        configuration.getCellRenderer().updateSelectedDate(selectedMonth, selectedYear);
 
         // Add days from selected month/year into the table
         fillDaysIntoCalendar();
@@ -189,7 +180,7 @@ public class CalendarPanel extends JPanel {
         calendarTable.setDefaultRenderer(calendarTable.getColumnClass(0), cellRenderer);
 
         // Add table actions
-        calendarTable.setComponentPopupMenu(actions.getAvailableActions());
+        calendarTable.setComponentPopupMenu(configuration.getActions().getAvailableActions());
         calendarTable.addMouseListener(new SelectCellMouseListener());
 
         // Configure table size
@@ -237,7 +228,7 @@ public class CalendarPanel extends JPanel {
             final int finalDay = day;
             final int finalRow = row;
             final int finalColumn = column;
-            final CompletableFuture<CalendarDayCell> calendarDayCellInfo = service.get(selectedYear,
+            final CompletableFuture<CalendarDayCell> calendarDayCellInfo = configuration.getService().get(selectedYear,
                     (selectedMonth + 1), day, row, column);
 
             calendarDayCellInfo.whenComplete((info, exception) -> {
@@ -305,7 +296,7 @@ public class CalendarPanel extends JPanel {
         public void actionPerformed(final ActionEvent e) {
             try {
                 Object valor = calendarTableModel.getValueAt(selectedRow, selectedColumn);
-                actions.manageActionEvents(calendarInstance, e.getSource(), e.getActionCommand(), (CalendarDayCell) valor, selectedRow,
+                configuration.getActions().manageActionEvents(calendarInstance, e.getSource(), e.getActionCommand(), (CalendarDayCell) valor, selectedRow,
                         selectedColumn);
             } catch (final Exception ex) {
                 log.error("Error gestionando evento del calendario. Error: ", ex);

@@ -1,10 +1,15 @@
 package io.github.squdan.swing.components.panel.table.cell;
 
 import io.github.squdan.swing.components.SwingComponentsItem;
+import io.github.squdan.swing.components.util.date.DateTimeUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.TimeZone;
 
 public class SwingComponentsTableCellRenderer extends DefaultTableCellRenderer {
 
@@ -20,6 +25,12 @@ public class SwingComponentsTableCellRenderer extends DefaultTableCellRenderer {
 
         if (value instanceof SwingComponentsItem<?> valueCasted) {
             cellValue = valueCasted.toTextField();
+        } else if (value instanceof Instant date) {
+            cellValue = DateTimeUtils.InstantSourceMethods.toString(date, TimeZone.getDefault().toZoneId());
+        } else if (value instanceof LocalDate date) {
+            cellValue = DateTimeUtils.LocalDateSourceMethods.toString(date);
+        } else if (value instanceof LocalDateTime date) {
+            cellValue = DateTimeUtils.LocalDateTimeSourceMethods.toString(date);
         } else if (value instanceof Color) {
             cellValue = colorToString((Color) value);
         }

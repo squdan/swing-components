@@ -7,6 +7,7 @@ import lombok.Getter;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
+import java.util.Random;
 
 /**
  * Color selector representation using {@link JPanel}.
@@ -16,6 +17,7 @@ import java.util.Objects;
 public class ColorSelectorPanel extends JPanel {
 
     // Components
+    private static final Random RANDOM = new Random();
     private final JButton colorButton;
 
     // Data
@@ -64,12 +66,30 @@ public class ColorSelectorPanel extends JPanel {
         this.add(this.colorButton);
     }
 
-    private void updateButtonColor(final Color color) {
-        this.colorButton.setText(colorToString(color));
-        ViewUtils.changeButtonColorBackground(this.colorButton, color);
+    public static Color generateRandomColor() {
+        final int r = RANDOM.nextInt(256);
+        final int g = RANDOM.nextInt(256);
+        final int b = RANDOM.nextInt(256);
+        return new Color(r, g, b);
+    }
+
+    public void setColor(final Color color) {
+        this.selectedColor = color;
+        updateButtonColor(selectedColor);
     }
 
     public static String colorToString(final Color color) {
-        return String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+        String result = null;
+
+        if (Objects.nonNull(color)) {
+            result = String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+        }
+
+        return result;
+    }
+
+    private void updateButtonColor(final Color color) {
+        this.colorButton.setText(colorToString(color));
+        ViewUtils.changeButtonColorBackground(this.colorButton, color);
     }
 }

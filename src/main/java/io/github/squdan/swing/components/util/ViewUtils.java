@@ -3,6 +3,7 @@ package io.github.squdan.swing.components.util;
 import io.github.squdan.swing.components.SwingComponentsException;
 import io.github.squdan.swing.components.configuration.SwingComponents;
 import io.github.squdan.swing.components.util.customize.CustomButtonBorder;
+import io.github.squdan.swing.components.util.date.DateTimeUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.FileUtils;
@@ -41,7 +42,7 @@ public final class ViewUtils {
 
         try {
             final BufferedImage bufferedImage = toBufferedImage(component);
-            final String fileName = DateTimeUtils.LocalDateTimeUtils.toString(LocalDateTime.now()).split("\\.")[0]
+            final String fileName = DateTimeUtils.LocalDateTimeSourceMethods.toString(LocalDateTime.now()).split("\\.")[0]
                     .replace(":", "-");
             final File imageFile = new File(String.format("%s/%s/%s.png", SCREENSHOTS_PATH, componentName, fileName));
             FileUtils.touch(imageFile);
