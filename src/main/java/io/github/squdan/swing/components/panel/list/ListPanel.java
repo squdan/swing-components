@@ -12,6 +12,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,10 +29,10 @@ public class ListPanel<T extends SwingComponentsItem<K>, K> extends JPanel {
 
     // Data
     private final DefaultListModel<T> listModel = new DefaultListModel<>();
-    private final JList<T> jListElements;
+    private final JList<T> jListElements = new JList<>(listModel);
 
     @Getter
-    private final List<T> listElemements;
+    private final List<T> listElemements = new ArrayList<>();
 
     public ListPanel(final JLabel header) {
         this(header, null, null);
@@ -49,16 +50,11 @@ public class ListPanel<T extends SwingComponentsItem<K>, K> extends JPanel {
         super(new GridLayout(0, 1));
 
         // Initializations
-        this.jListElements = new JList<>(listModel);
-        this.listElemements = values;
+        setValues(values);
 
         // Configure elements list
         this.jListElements.setCellRenderer(new ListItemTextFieldCellRenderer());
         this.jListElements.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        if (CollectionUtils.isNotEmpty(this.listElemements)) {
-            listModel.addAll(this.listElemements);
-        }
 
         if (Objects.nonNull(managementService)) {
             this.jListElements.addListSelectionListener(new SelectedElementListener(managementService));
@@ -89,13 +85,17 @@ public class ListPanel<T extends SwingComponentsItem<K>, K> extends JPanel {
         }
     }
 
-    public void addValues(final List<T> values) {
-        this.listModel.addAll(values);
+    public void setValues(final List<T> values) {
+        this.listElemements.clear();
+        this.listModel.clear();
+        addValues(values);
     }
 
-    public void setValues(final List<T> values) {
-        this.listModel.clear();
-        this.listModel.addAll(values);
+    public void addValues(final List<T> values) {
+        if (CollectionUtils.isNotEmpty(values)) {
+            this.listElemements.addAll(values);
+            this.listModel.addAll(values);
+        }
     }
 
     private class SelectedElementListener implements ListSelectionListener {

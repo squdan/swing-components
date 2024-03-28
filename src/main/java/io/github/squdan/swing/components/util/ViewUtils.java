@@ -105,7 +105,12 @@ public final class ViewUtils {
         button.setBackground(color);
 
         // Configure border
-        button.setBorder(new CustomButtonBorder(color));
+        changeComponentColorBorder(button, color);
+    }
+
+    public static void changeComponentColorBorder(final JComponent component, final Color color) {
+        // Configure border
+        component.setBorder(new CustomButtonBorder(color));
     }
 
     public static JPanel generateVerticalBigPanelMultipleHeaders(final JComponent bodyComponent,
