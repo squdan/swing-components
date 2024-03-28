@@ -9,6 +9,7 @@ import java.awt.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.TimeZone;
 
 public class SwingComponentsTableCellRenderer extends DefaultTableCellRenderer {
@@ -16,33 +17,39 @@ public class SwingComponentsTableCellRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(final JTable table, final Object value,
                                                    final boolean isSelected, final boolean hasFocus, final int row, final int column) {
+        Component result;
+
         // Reset previous configuration
         super.setBackground(null);
         super.setForeground(null);
 
-        // Select value to draw into the cell
-        Object cellValue = value;
+        if (Objects.nonNull(value)) {
+            // Select value to draw into the cell
+            Object cellValue = value;
 
-        if (value instanceof SwingComponentsItem<?> valueCasted) {
-            cellValue = valueCasted.toTextField();
-        } else if (value instanceof Instant date) {
-            cellValue = DateTimeUtils.InstantSourceMethods.toString(date, TimeZone.getDefault().toZoneId());
-        } else if (value instanceof LocalDate date) {
-            cellValue = DateTimeUtils.LocalDateSourceMethods.toString(date);
-        } else if (value instanceof LocalDateTime date) {
-            cellValue = DateTimeUtils.LocalDateTimeSourceMethods.toString(date);
-        } else if (value instanceof Color) {
-            cellValue = colorToString((Color) value);
-        }
+            if (value instanceof SwingComponentsItem<?> valueCasted) {
+                cellValue = valueCasted.toTextField();
+            } else if (value instanceof Instant date) {
+                cellValue = DateTimeUtils.InstantSourceMethods.toString(date, TimeZone.getDefault().toZoneId());
+            } else if (value instanceof LocalDate date) {
+                cellValue = DateTimeUtils.LocalDateSourceMethods.toString(date);
+            } else if (value instanceof LocalDateTime date) {
+                cellValue = DateTimeUtils.LocalDateTimeSourceMethods.toString(date);
+            } else if (value instanceof Color) {
+                cellValue = colorToString((Color) value);
+            }
 
-        // Call to DefaultTableCellRenderer to render value
-        final Component result = super.getTableCellRendererComponent(table, cellValue, isSelected, hasFocus, row, column);
+            // Call to DefaultTableCellRenderer to render value
+            result = super.getTableCellRendererComponent(table, cellValue, isSelected, hasFocus, row, column);
 
-        // Change background if color configured
-        if (value instanceof SwingComponentsItem<?> valueCasted) {
-            super.setBackground(valueCasted.getColor());
-        } else if (value instanceof Color) {
-            super.setBackground((Color) value);
+            // Change background if color configured
+            if (value instanceof SwingComponentsItem<?> valueCasted && Objects.nonNull(valueCasted.getColor())) {
+                super.setBackground(valueCasted.getColor());
+            } else if (value instanceof Color) {
+                super.setBackground((Color) value);
+            }
+        } else {
+            result = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
 
         return result;

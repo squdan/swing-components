@@ -28,7 +28,7 @@ public class GenericTableModel<T> extends AbstractTableModel {
     private static final long serialVersionUID = 1661124786644146937L;
 
     // Configuration
-    public static final String UNKNOWN = "??";
+    public static final String UNKNOWN = StringUtils.EMPTY;
 
     // Data
     private final List<ColumnInfo> columns;
@@ -100,8 +100,6 @@ public class GenericTableModel<T> extends AbstractTableModel {
 
         if (Objects.nonNull(mayObjectValue)) {
             result = mayObjectValue;
-        } else {
-            log.error("Error al recuperar el valor de la columna '{} - {}'.", columnIndex, columnModelName);
         }
 
         return result;
