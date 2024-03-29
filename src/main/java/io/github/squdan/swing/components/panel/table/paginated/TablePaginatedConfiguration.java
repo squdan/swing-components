@@ -1,0 +1,17 @@
+package io.github.squdan.swing.components.panel.table.paginated;
+
+import io.github.squdan.swing.components.panel.table.normal.TableConfiguration;
+import io.github.squdan.swing.components.panel.table.paginated.provider.TablePaginatedDataProvider;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+@Data
+@SuperBuilder
+@RequiredArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class TablePaginatedConfiguration<T, K> extends TableConfiguration<T, K> {
+
+    private final TablePaginatedDataProvider<K> provider;
+}

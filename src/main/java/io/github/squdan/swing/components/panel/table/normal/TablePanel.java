@@ -33,8 +33,8 @@ import java.util.stream.Stream;
  * which contains elements to show in the table and column information. This component will offer some on-click action
  * if they are implemented at received {@link TableActions} implementation.
  * <p>
- * @param T: view type.
- * @param K: table type.
+ * T: view type.
+ * K: table type.
  */
 @Slf4j
 public class TablePanel<T, K> extends JPanel {
@@ -43,11 +43,11 @@ public class TablePanel<T, K> extends JPanel {
     private static final long serialVersionUID = 8438204457927336847L;
 
     // Table state
-    private final JTable table;
-    private final GenericTableModel<K> tableModel;
-    private final TableActions<K> tableActions;
-    private int selectedRow;
-    private int selectedColumn;
+    protected final JTable table;
+    protected final GenericTableModel<K> tableModel;
+    protected final TableActions<K> tableActions;
+    protected int selectedRow;
+    protected int selectedColumn;
 
     /**
      * Constructor to configure table requirements.
@@ -55,47 +55,41 @@ public class TablePanel<T, K> extends JPanel {
      * @param configuration: configuration container with all required and optional features.
      */
     public TablePanel(final TableConfiguration<T, K> configuration) {
+        this(configuration, true);
+    }
+
+    /**
+     * Protected constructor to avoid representation configuration.
+     */
+    protected TablePanel(final TableConfiguration<T, K> configuration, final Boolean configureGraphic) {
         super(new GridLayout(1, 1));
         this.tableModel = configuration.getTableModel();
         this.tableActions = configuration.getTableActions();
 
         // Generate and configure table
-        this.table = getConfiguredTable(tableModel);
-        final JComponent tableContainer = new JScrollPane(table);
+        this.table = getConfiguredTable();
 
         // Adds table actions
-        if (Objects.nonNull(tableActions)) {
-            table.setComponentPopupMenu(tableActions.getAvailableCellActions());
-            tableContainer.setComponentPopupMenu(tableActions.getAvailableTableActions());
+        if (Objects.nonNull(this.tableActions)) {
+            this.table.setComponentPopupMenu(this.tableActions.getAvailableCellActions());
 
             // Register action listeners
-            table.addMouseListener(new SelectCellMouseListener());
+            this.table.addMouseListener(new SelectCellMouseListener());
             final AvailableActionsListener availableActionsListener = new AvailableActionsListener(configuration.getView(), configuration.getViewInput());
-            Stream.of(tableActions.getAvailableCellActions().getComponents()).map(c -> (JMenuItem) c)
+            Stream.of(this.tableActions.getAvailableCellActions().getComponents()).map(c -> (JMenuItem) c)
                     .forEach(c -> c.addActionListener(availableActionsListener));
-            Stream.of(tableActions.getAvailableTableActions().getComponents()).map(c -> (JMenuItem) c)
+            Stream.of(this.tableActions.getAvailableTableActions().getComponents()).map(c -> (JMenuItem) c)
                     .forEach(c -> c.addActionListener(availableActionsListener));
         }
 
-        // Generate filters
-        if (BooleanUtils.isTrue(configuration.getEnableFilteringAndSorting())) {
-            final List<FilterTextField<GenericTableModel<K>>> filters = configureTableFilters(tableModel, table);
-
-            // Panel configuration
-            final JPanel tablePanel = ViewUtils.generateVerticalBigPanelMultipleHeaders(tableContainer,
-                    filters.toArray(new FilterTextField[0]));
-            this.add(ViewUtils.generateVerticalBigPanelMultipleHeaders(tablePanel, getTableTitle(configuration.getTitle())));
-        } else {
-            // Configure default sorting
-            table.setAutoCreateRowSorter(true);
-
-            // Panel configuration
-            this.add(ViewUtils.generateVerticalBigPanelMultipleHeaders(tableContainer, getTableTitle(configuration.getTitle())));
+        // Configure representation
+        if (BooleanUtils.isTrue(configureGraphic)) {
+            configureTableRepresentation(configuration.getTitle(), configuration.getEnableFilteringAndSorting());
         }
     }
 
-    private JTable getConfiguredTable(final GenericTableModel<K> tableModel) {
-        final JTable result = new JTable(tableModel);
+    protected JTable getConfiguredTable() {
+        final JTable result = new JTable(this.tableModel);
 
         // Table configuration
         result.getTableHeader().setResizingAllowed(false);
@@ -110,14 +104,39 @@ public class TablePanel<T, K> extends JPanel {
         return result;
     }
 
-    private List<FilterTextField<GenericTableModel<K>>> configureTableFilters(final GenericTableModel<K> tableModel, final JTable table) {
+    protected void configureTableRepresentation(final String title, final Boolean enableFilteringAndSorting) {
+        final JComponent tableContainer = new JScrollPane(this.table);
+
+        // Adds table actions
+        if (Objects.nonNull(this.tableActions)) {
+            tableContainer.setComponentPopupMenu(this.tableActions.getAvailableTableActions());
+        }
+
+        // Generate filters
+        if (BooleanUtils.isTrue(enableFilteringAndSorting)) {
+            final List<FilterTextField<GenericTableModel<K>>> filters = configureTableFilters();
+
+            // Panel configuration
+            final JPanel tablePanel = ViewUtils.generateVerticalBigPanelMultipleHeaders(tableContainer,
+                    filters.toArray(new FilterTextField[0]));
+            this.add(ViewUtils.generateVerticalBigPanelMultipleHeaders(tablePanel, getTableTitle(title)));
+        } else {
+            // Configure default sorting
+            this.table.setAutoCreateRowSorter(true);
+
+            // Panel configuration
+            this.add(ViewUtils.generateVerticalBigPanelMultipleHeaders(tableContainer, getTableTitle(title)));
+        }
+    }
+
+    protected List<FilterTextField<GenericTableModel<K>>> configureTableFilters() {
         final List<FilterTextField<GenericTableModel<K>>> filters = new ArrayList<>();
 
         // Generate table sorter from table model
-        final TableRowSorter<GenericTableModel<K>> sorter = new TableRowSorter<>(tableModel);
+        final TableRowSorter<GenericTableModel<K>> sorter = new TableRowSorter<>(this.tableModel);
 
         // Generate filters for each configured column
-        for (ColumnInfo column : tableModel.getColumns()) {
+        for (ColumnInfo column : this.tableModel.getColumns()) {
             filters.add(new FilterTextField<>(column.getName(), sorter, column.getNumber()));
         }
 
@@ -132,13 +151,13 @@ public class TablePanel<T, K> extends JPanel {
         });
 
         // Add sorter with filters to the table
-        table.setRowSorter(sorter);
+        this.table.setRowSorter(sorter);
 
         return filters;
     }
 
     @AllArgsConstructor
-    private class AvailableActionsListener implements ActionListener {
+    protected class AvailableActionsListener implements ActionListener {
         private final SwingComponentsView<T> view;
         private final T viewInput;
 
@@ -159,7 +178,7 @@ public class TablePanel<T, K> extends JPanel {
         }
     }
 
-    private class SelectCellMouseListener extends MouseAdapter {
+    protected class SelectCellMouseListener extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
             selectedRow = table.rowAtPoint(e.getPoint());
@@ -167,7 +186,7 @@ public class TablePanel<T, K> extends JPanel {
         }
     }
 
-    private JComponent getTableTitle(final String text) {
+    protected JComponent getTableTitle(final String text) {
         final JLabel dashboardTitle = new JLabel(text, SwingConstants.CENTER);
         dashboardTitle.setForeground(SwingComponents.getConfiguration().getColorConfiguration().getPrimaryText());
         dashboardTitle.setFont(SwingComponents.getConfiguration().getTextConfiguration().getTitleFont());

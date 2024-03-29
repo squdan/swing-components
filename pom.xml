@@ -76,6 +76,20 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- Database - Page import -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- QueryDsl - Custom database filters -->
+        <dependency>
+            <groupId>io.github.squdan</groupId>
+            <artifactId>querydsl-filters</artifactId>
+            <version>0.0.3</version>
+        </dependency>
+
+
         <!-- Swing Aspect (https://www.formdev.com/flatlaf/) -->
         <dependency>
             <groupId>com.formdev</groupId>

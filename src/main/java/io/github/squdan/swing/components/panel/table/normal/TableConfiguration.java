@@ -4,12 +4,14 @@ import io.github.squdan.swing.components.SwingComponentsView;
 import io.github.squdan.swing.components.panel.table.common.action.TableActions;
 import io.github.squdan.swing.components.panel.table.common.model.GenericTableModel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
+@NoArgsConstructor(force = true)
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class TableConfiguration<T, K> {
