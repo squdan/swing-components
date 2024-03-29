@@ -1,6 +1,6 @@
-package io.github.squdan.swing.components.panel.table.model;
+package io.github.squdan.swing.components.panel.table.normal.model;
 
-import io.github.squdan.swing.components.panel.table.action.TableFilterListener;
+import io.github.squdan.swing.components.panel.table.normal.action.TableFilterListener;
 import io.github.squdan.swing.components.text.PlaceholderTextField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

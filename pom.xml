@@ -173,7 +173,7 @@
             </plugin>
 
             <!-- To add javadoc to the jar (necessary to upload to maven-central) -->
-            <plugin>
+            <!-- <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <executions>
@@ -184,7 +184,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
 
             <!-- Sign code to upload to nexus -->
             <!-- https://central.sonatype.org/publish/publish-maven/#gpg-signed-components -->

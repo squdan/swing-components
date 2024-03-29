@@ -1,6 +1,6 @@
-package io.github.squdan.swing.components.panel.table.model;
+package io.github.squdan.swing.components.panel.table.common.model;
 
-import io.github.squdan.swing.components.panel.table.TablePanel;
+import io.github.squdan.swing.components.panel.table.normal.TablePanel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

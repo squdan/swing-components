@@ -1,8 +1,8 @@
-package io.github.squdan.swing.components.panel.table.action;
+package io.github.squdan.swing.components.panel.table.common.action;
 
 import io.github.squdan.swing.components.panel.calendar.cell.CalendarDayCell;
-import io.github.squdan.swing.components.panel.table.TablePanel;
-import io.github.squdan.swing.components.panel.table.model.ColumnInfo;
+import io.github.squdan.swing.components.panel.table.normal.TablePanel;
+import io.github.squdan.swing.components.panel.table.common.model.ColumnInfo;
 
 /**
  * Interface to define service actions to use into {@link TableActions} that will be offered in each cell

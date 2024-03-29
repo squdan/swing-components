@@ -1,7 +1,7 @@
-package io.github.squdan.swing.components.panel.table.action;
+package io.github.squdan.swing.components.panel.table.normal.action;
 
-import io.github.squdan.swing.components.panel.table.TablePanel;
-import io.github.squdan.swing.components.panel.table.model.FilterTextField;
+import io.github.squdan.swing.components.panel.table.normal.TablePanel;
+import io.github.squdan.swing.components.panel.table.normal.model.FilterTextField;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;

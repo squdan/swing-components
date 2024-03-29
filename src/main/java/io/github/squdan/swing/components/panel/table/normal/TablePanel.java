@@ -1,12 +1,12 @@
-package io.github.squdan.swing.components.panel.table;
+package io.github.squdan.swing.components.panel.table.normal;
 
 import io.github.squdan.swing.components.SwingComponentsView;
 import io.github.squdan.swing.components.configuration.SwingComponents;
-import io.github.squdan.swing.components.panel.table.action.TableActions;
-import io.github.squdan.swing.components.panel.table.cell.SwingComponentsTableCellRenderer;
-import io.github.squdan.swing.components.panel.table.model.ColumnInfo;
-import io.github.squdan.swing.components.panel.table.model.FilterTextField;
-import io.github.squdan.swing.components.panel.table.model.GenericTableModel;
+import io.github.squdan.swing.components.panel.table.common.action.TableActions;
+import io.github.squdan.swing.components.panel.table.common.cell.SwingComponentsTableCellRenderer;
+import io.github.squdan.swing.components.panel.table.common.model.ColumnInfo;
+import io.github.squdan.swing.components.panel.table.common.model.GenericTableModel;
+import io.github.squdan.swing.components.panel.table.normal.model.FilterTextField;
 import io.github.squdan.swing.components.util.ViewUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,37 +32,32 @@ import java.util.stream.Stream;
  * This implementation will show a table using received source information from {@link GenericTableModel} implementation,
  * which contains elements to show in the table and column information. This component will offer some on-click action
  * if they are implemented at received {@link TableActions} implementation.
+ * <p>
+ * @param T: view type.
+ * @param K: table type.
  */
 @Slf4j
-public class TablePanel<Z, T, K extends GenericTableModel<T>> extends JPanel {
+public class TablePanel<T, K> extends JPanel {
 
     @Serial
     private static final long serialVersionUID = 8438204457927336847L;
 
     // Table state
-    private final SwingComponentsView<Z> origin;
     private final JTable table;
-    private final K tableModel;
-    private final TableActions<T> tableActions;
+    private final GenericTableModel<K> tableModel;
+    private final TableActions<K> tableActions;
     private int selectedRow;
     private int selectedColumn;
 
     /**
      * Constructor to configure table requirements.
      *
-     * @param origin:        current view to refresh when some action is executed.
-     * @param originInput:   current view input data to refresh when some action is executed.
-     * @param title:         title to show in the table.
-     * @param tableModel:    source elements information.
-     * @param tableActions:  available user actions over table and cells.
-     * @param enableFilters: if true, filter and sorting will be enabled.
+     * @param configuration: configuration container with all required and optional features.
      */
-    public TablePanel(final SwingComponentsView<Z> origin, final Z originInput, final String title, final K tableModel, final TableActions<T> tableActions,
-                      final Boolean enableFilters) {
+    public TablePanel(final TableConfiguration<T, K> configuration) {
         super(new GridLayout(1, 1));
-        this.origin = origin;
-        this.tableModel = tableModel;
-        this.tableActions = tableActions;
+        this.tableModel = configuration.getTableModel();
+        this.tableActions = configuration.getTableActions();
 
         // Generate and configure table
         this.table = getConfiguredTable(tableModel);
@@ -75,30 +70,31 @@ public class TablePanel<Z, T, K extends GenericTableModel<T>> extends JPanel {
 
             // Register action listeners
             table.addMouseListener(new SelectCellMouseListener());
+            final AvailableActionsListener availableActionsListener = new AvailableActionsListener(configuration.getView(), configuration.getViewInput());
             Stream.of(tableActions.getAvailableCellActions().getComponents()).map(c -> (JMenuItem) c)
-                    .forEach(c -> c.addActionListener(new OpenPopupDayActionListener(originInput)));
+                    .forEach(c -> c.addActionListener(availableActionsListener));
             Stream.of(tableActions.getAvailableTableActions().getComponents()).map(c -> (JMenuItem) c)
-                    .forEach(c -> c.addActionListener(new OpenPopupDayActionListener(originInput)));
+                    .forEach(c -> c.addActionListener(availableActionsListener));
         }
 
         // Generate filters
-        if (BooleanUtils.isTrue(enableFilters)) {
-            final List<FilterTextField<K>> filters = configureTableFilters(tableModel, table);
+        if (BooleanUtils.isTrue(configuration.getEnableFilteringAndSorting())) {
+            final List<FilterTextField<GenericTableModel<K>>> filters = configureTableFilters(tableModel, table);
 
             // Panel configuration
             final JPanel tablePanel = ViewUtils.generateVerticalBigPanelMultipleHeaders(tableContainer,
                     filters.toArray(new FilterTextField[0]));
-            this.add(ViewUtils.generateVerticalBigPanelMultipleHeaders(tablePanel, getTableTitle(title)));
+            this.add(ViewUtils.generateVerticalBigPanelMultipleHeaders(tablePanel, getTableTitle(configuration.getTitle())));
         } else {
             // Configure default sorting
             table.setAutoCreateRowSorter(true);
 
             // Panel configuration
-            this.add(ViewUtils.generateVerticalBigPanelMultipleHeaders(tableContainer, getTableTitle(title)));
+            this.add(ViewUtils.generateVerticalBigPanelMultipleHeaders(tableContainer, getTableTitle(configuration.getTitle())));
         }
     }
 
-    private JTable getConfiguredTable(final K tableModel) {
+    private JTable getConfiguredTable(final GenericTableModel<K> tableModel) {
         final JTable result = new JTable(tableModel);
 
         // Table configuration
@@ -114,15 +110,15 @@ public class TablePanel<Z, T, K extends GenericTableModel<T>> extends JPanel {
         return result;
     }
 
-    private List<FilterTextField<K>> configureTableFilters(final K tableModel, final JTable table) {
-        final List<FilterTextField<K>> filters = new ArrayList<>();
+    private List<FilterTextField<GenericTableModel<K>>> configureTableFilters(final GenericTableModel<K> tableModel, final JTable table) {
+        final List<FilterTextField<GenericTableModel<K>>> filters = new ArrayList<>();
 
         // Generate table sorter from table model
-        final TableRowSorter<K> sorter = new TableRowSorter<K>(tableModel);
+        final TableRowSorter<GenericTableModel<K>> sorter = new TableRowSorter<>(tableModel);
 
         // Generate filters for each configured column
         for (ColumnInfo column : tableModel.getColumns()) {
-            filters.add(new FilterTextField<K>(column.getName(), sorter, column.getNumber()));
+            filters.add(new FilterTextField<>(column.getName(), sorter, column.getNumber()));
         }
 
         // Configure filters to clean each other
@@ -142,19 +138,20 @@ public class TablePanel<Z, T, K extends GenericTableModel<T>> extends JPanel {
     }
 
     @AllArgsConstructor
-    private class OpenPopupDayActionListener implements ActionListener {
-        private Z originInput;
+    private class AvailableActionsListener implements ActionListener {
+        private final SwingComponentsView<T> view;
+        private final T viewInput;
 
         @SuppressWarnings("unchecked")
         public void actionPerformed(ActionEvent e) {
             try {
                 final Object cellValue = tableModel.getValueAt(selectedRow, selectedColumn);
                 final Object rowValue = tableModel.getValueAt(selectedRow);
-                final boolean refresh = tableActions.manageActionEvents(e.getSource(), e.getActionCommand(), (T) rowValue, cellValue,
+                final boolean refresh = tableActions.manageActionEvents(e.getSource(), e.getActionCommand(), (K) rowValue, cellValue,
                         selectedRow, selectedColumn);
 
-                if (refresh && Objects.nonNull(origin)) {
-                    origin.refresh(originInput);
+                if (refresh && Objects.nonNull(this.view)) {
+                    this.view.refresh(this.viewInput);
                 }
             } catch (final Exception ex) {
                 log.error("Error gestionando eventos de la tabla. Error: ", ex);

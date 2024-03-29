@@ -1,9 +1,9 @@
-package io.github.squdan.swing.components.panel.table.action;
+package io.github.squdan.swing.components.panel.table.common.action;
 
 import io.github.squdan.swing.components.panel.calendar.action.CalendarDataManagerService;
 import io.github.squdan.swing.components.panel.calendar.cell.CalendarDayCell;
-import io.github.squdan.swing.components.panel.table.TablePanel;
-import io.github.squdan.swing.components.panel.table.model.ColumnInfo;
+import io.github.squdan.swing.components.panel.table.normal.TablePanel;
+import io.github.squdan.swing.components.panel.table.common.model.ColumnInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;

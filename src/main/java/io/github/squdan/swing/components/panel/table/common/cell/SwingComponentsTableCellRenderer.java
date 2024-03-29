@@ -1,4 +1,4 @@
-package io.github.squdan.swing.components.panel.table.cell;
+package io.github.squdan.swing.components.panel.table.common.cell;
 
 import io.github.squdan.swing.components.SwingComponentsItem;
 import io.github.squdan.swing.components.util.date.DateTimeUtils;
