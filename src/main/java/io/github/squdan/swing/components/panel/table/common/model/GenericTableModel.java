@@ -79,6 +79,10 @@ public class GenericTableModel<T> extends AbstractTableModel {
         return this.columns.get(columnIndex).getName();
     }
 
+    public Class<?> getColumnType(final int columnIndex) {
+        return this.columns.get(columnIndex).getType();
+    }
+
     public Object getValueAt(int rowIndex) {
         Object result = null;
 

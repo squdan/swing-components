@@ -5,6 +5,7 @@ import io.github.squdan.swing.components.panel.table.common.model.ColumnInfo;
 import io.github.squdan.swing.components.panel.table.common.model.GenericTableModel;
 import io.github.squdan.swing.components.panel.table.normal.TablePanel;
 import io.github.squdan.swing.components.panel.table.paginated.model.FilterPaginatedTextField;
+import io.github.squdan.swing.components.panel.table.paginated.provider.TablePaginatedContext;
 import io.github.squdan.swing.components.util.ViewUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
@@ -33,6 +34,9 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
     @Serial
     private static final long serialVersionUID = 8438204457727336847L;
 
+    // Data
+    private final TablePaginatedContext<K> paginationContext;
+
     /**
      * Constructor to configure table requirements.
      *
@@ -40,7 +44,7 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
      */
     public TablePaginatedPanel(final TablePaginatedConfiguration<T, K> configuration) {
         super(configuration, false);
-
+        this.paginationContext = new TablePaginatedContext<>(configuration.getTableModel(), configuration.getProvider(), configuration.getBaseFilters());
     }
 
     private void configureTablePaginatedRepresentation(final TablePaginatedConfiguration<T, K> configuration) {
@@ -53,7 +57,7 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
 
         // Generate filters
         if (BooleanUtils.isTrue(configuration.getEnableFilteringAndSorting())) {
-            final List<FilterPaginatedTextField<GenericTableModel<K>>> filters = configureTablePaginatedFilters(configuration);
+            final List<FilterPaginatedTextField<K>> filters = configureTablePaginatedFilters(configuration);
 
             // Panel configuration
             final JPanel tablePanel = ViewUtils.generateVerticalBigPanelMultipleHeaders(tableContainer,
@@ -68,15 +72,15 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
         }
     }
 
-    private List<FilterPaginatedTextField<GenericTableModel<K>>> configureTablePaginatedFilters(final TablePaginatedConfiguration<T, K> configuration) {
-        final List<FilterPaginatedTextField<GenericTableModel<K>>> filters = new ArrayList<>();
+    private List<FilterPaginatedTextField<K>> configureTablePaginatedFilters(final TablePaginatedConfiguration<T, K> configuration) {
+        final List<FilterPaginatedTextField<K>> filters = new ArrayList<>();
 
         // Generate table sorter from table model
         final TableRowSorter<GenericTableModel<K>> sorter = new TableRowSorter<>(this.tableModel);
 
         // Generate filters for each configured column
         for (ColumnInfo column : this.tableModel.getColumns()) {
-            filters.add(new FilterPaginatedTextField<>(column.getName(), sorter, column.getNumber()));
+            filters.add(new FilterPaginatedTextField<>(column.getName(), paginationContext, column.getNumber()));
         }
 
         // Configure filters to clean each other

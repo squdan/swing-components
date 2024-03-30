@@ -1,6 +1,7 @@
 package io.github.squdan.swing.components.panel.table.paginated.model;
 
 import io.github.squdan.swing.components.panel.table.paginated.action.TablePaginatedFilterListener;
+import io.github.squdan.swing.components.panel.table.paginated.provider.TablePaginatedContext;
 import io.github.squdan.swing.components.text.PlaceholderTextField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class FilterPaginatedTextField<T extends AbstractTableModel> extends PlaceholderTextField {
+public class FilterPaginatedTextField<T> extends PlaceholderTextField {
 
     /**
      * Generated Serial Version UID
@@ -23,10 +24,10 @@ public class FilterPaginatedTextField<T extends AbstractTableModel> extends Plac
     // Data
     private TablePaginatedFilterListener<T> filterListener;
 
-    public FilterPaginatedTextField(final String placeholder, final TableRowSorter<T> tableSorter, final int column) {
+    public FilterPaginatedTextField(final String placeholder, final TablePaginatedContext<T> paginationContext, final int column) {
         super(placeholder, null);
 
-        this.filterListener = new TablePaginatedFilterListener<T>(tableSorter, column);
+        this.filterListener = new TablePaginatedFilterListener<>(paginationContext, column);
         this.getDocument().addDocumentListener(this.filterListener);
     }
 

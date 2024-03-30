@@ -22,4 +22,6 @@ public class ColumnInfo {
     // Column field name from model
     private String modelName;
 
+    // Column field value type
+    private Class<?> type;
 }

@@ -1,7 +1,10 @@
 package io.github.squdan.swing.components.panel.table.paginated.action;
 
+import io.github.squdan.querydsl.filters.QueryDslFilter;
+import io.github.squdan.querydsl.filters.QueryDslOperators;
 import io.github.squdan.swing.components.panel.table.normal.TablePanel;
 import io.github.squdan.swing.components.panel.table.paginated.model.FilterPaginatedTextField;
+import io.github.squdan.swing.components.panel.table.paginated.provider.TablePaginatedContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -9,8 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableRowSorter;
 import javax.swing.text.BadLocationException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,15 +22,15 @@ import java.util.List;
  * @param <T> AbstractTableModel implementation.
  */
 @Slf4j
-public class TablePaginatedFilterListener<T extends AbstractTableModel> implements DocumentListener {
+public class TablePaginatedFilterListener<T> implements DocumentListener {
 
     // Data
     private final List<FilterPaginatedTextField<T>> filtersToClean = new ArrayList<>();
-    private final TableRowSorter<T> tableSorter;
+    private final TablePaginatedContext<T> paginationContext;
     private final int column;
 
-    public TablePaginatedFilterListener(final TableRowSorter<T> tableSorter, final int column) {
-        this.tableSorter = tableSorter;
+    public TablePaginatedFilterListener(final TablePaginatedContext<T> paginationContext, final int column) {
+        this.paginationContext = paginationContext;
         this.column = column;
     }
 
@@ -75,14 +76,20 @@ public class TablePaginatedFilterListener<T extends AbstractTableModel> implemen
 
         // This will reset filters to show all results
         if (StringUtils.isBlank(filter)) {
-            tableSorter.setRowFilter(null);
-
+            paginationContext.find(null);
         }
 
         // Apply current filter
         else {
-            RowFilter<T, Object> rf = RowFilter.regexFilter(filter, column);
-            tableSorter.setRowFilter(rf);
+            //final Class<?> columnType = this.paginationContext.getTableModel().getColumnType(column);
+            // TODO: Comprobar si es necesario filtrar la operación por tipo
+            final List<QueryDslFilter> filters = List.of(
+                    QueryDslFilter.builder()
+                            .key(this.paginationContext.getTableModel().getColumnName(column))
+                            .operator(QueryDslOperators.CONTAIN_FUNCTION)
+                            .value(filter)
+                            .build());
+            paginationContext.find(filters);
 
             // Clean other filters
             if (CollectionUtils.isNotEmpty(filtersToClean)) {
