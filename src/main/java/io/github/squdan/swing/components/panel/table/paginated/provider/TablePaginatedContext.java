@@ -2,14 +2,17 @@ package io.github.squdan.swing.components.panel.table.paginated.provider;
 
 import io.github.squdan.querydsl.filters.QueryDslFilter;
 import io.github.squdan.swing.components.panel.table.common.model.GenericTableModel;
+import io.github.squdan.swing.components.panel.table.paginated.TablePaginatedPanel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.Assert;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +25,8 @@ public class TablePaginatedContext<T> {
     public static Integer DEFAULT_PAGE_SIZE = 50;
 
     // Data
+    private final TablePaginatedPanel<?, T> table;
+
     private final GenericTableModel<T> tableModel;
 
     private final TablePaginatedDataProvider<T> provider;
@@ -34,6 +39,18 @@ public class TablePaginatedContext<T> {
 
     private Page<T> currentPage;
 
+    public void reload() {
+        if (Objects.isNull(this.pageConfiguration)) {
+            setDefaultPageable();
+        }
+
+        find(this.customFilters, this.pageConfiguration.getSort());
+    }
+
+    public void find() {
+        find(null, null);
+    }
+
     public void find(final List<QueryDslFilter> filters) {
         find(filters, null);
     }
@@ -42,7 +59,7 @@ public class TablePaginatedContext<T> {
         // Requirements
         Assert.notNull(this.provider, "Provider not configured.");
 
-        // Execution
+        // Update pagination configuration
         this.customFilters = filters;
 
         if (Objects.nonNull(this.pageConfiguration)) {
@@ -52,10 +69,27 @@ public class TablePaginatedContext<T> {
         }
 
         updateSorting(sort);
-        final List<QueryDslFilter> joinFilters = new ArrayList<>(filters);
-        joinFilters.addAll(baseFilters);
-        this.currentPage = this.provider.find(joinFilters, this.pageConfiguration);
-        this.tableModel.setData(this.currentPage.getContent());
+
+        // Prepare filters to search
+        final List<QueryDslFilter> joinFilters = new ArrayList<>();
+
+        if (CollectionUtils.isNotEmpty(this.customFilters)) {
+            joinFilters.addAll(this.customFilters);
+        }
+
+        if (CollectionUtils.isNotEmpty(this.baseFilters)) {
+            joinFilters.addAll(this.baseFilters);
+        }
+
+        // Execute search and save results
+        try {
+            this.currentPage = this.provider.find(joinFilters, this.pageConfiguration);
+            this.tableModel.setData(this.currentPage.getContent());
+            this.table.refresh();
+        } catch (final Exception e) {
+            final String errorMsg = "Error interno durante la búsqueda.";
+            JOptionPane.showMessageDialog(null, errorMsg, "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public void updatePage(final int pageNumber, final int pageSize) {

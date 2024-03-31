@@ -44,7 +44,11 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
      */
     public TablePaginatedPanel(final TablePaginatedConfiguration<T, K> configuration) {
         super(configuration, false);
-        this.paginationContext = new TablePaginatedContext<>(configuration.getTableModel(), configuration.getProvider(), configuration.getBaseFilters());
+        this.paginationContext = new TablePaginatedContext<>(this, configuration.getTableModel(), configuration.getProvider(), configuration.getBaseFilters());
+        this.paginationContext.find();
+
+        // Configure paginated representation
+        configureTablePaginatedRepresentation(configuration);
     }
 
     private void configureTablePaginatedRepresentation(final TablePaginatedConfiguration<T, K> configuration) {
@@ -97,5 +101,13 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
         this.table.setRowSorter(sorter);
 
         return filters;
+    }
+
+    public void reload() {
+        this.paginationContext.reload();
+    }
+
+    public void refresh() {
+        this.table.repaint();
     }
 }
