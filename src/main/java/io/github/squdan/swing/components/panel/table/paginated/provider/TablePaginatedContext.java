@@ -21,9 +21,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class TablePaginatedContext<T> {
 
-    // Configuration
-    public static Integer DEFAULT_PAGE_SIZE = 50;
-
     // Data
     private final TablePaginatedPanel<?, T> table;
 
@@ -33,11 +30,53 @@ public class TablePaginatedContext<T> {
 
     private final List<QueryDslFilter> baseFilters;
 
+    private final Integer pageElements;
+
     private List<QueryDslFilter> customFilters;
 
     private Pageable pageConfiguration;
 
     private Page<T> currentPage;
+
+    public int getCurrentPage() {
+        int result = 0;
+
+        if (Objects.nonNull(this.currentPage)) {
+            result = this.currentPage.getNumber();
+        }
+
+        return result;
+    }
+
+    public int getTotalPages() {
+        int result = 0;
+
+        if (Objects.nonNull(this.currentPage)) {
+            result = this.currentPage.getTotalPages();
+        }
+
+        return result;
+    }
+
+    public long getTotalElements() {
+        long result = 0;
+
+        if (Objects.nonNull(this.currentPage)) {
+            result = this.currentPage.getTotalElements();
+        }
+
+        return result;
+    }
+
+    public int getPageElements() {
+        int result = 0;
+
+        if (Objects.nonNull(this.currentPage)) {
+            result = this.currentPage.getPageable().getPageSize();
+        }
+
+        return result;
+    }
 
     public void reload() {
         if (Objects.isNull(this.pageConfiguration)) {
@@ -137,6 +176,6 @@ public class TablePaginatedContext<T> {
     }
 
     private void setDefaultPageable() {
-        updatePage(0, DEFAULT_PAGE_SIZE);
+        updatePage(0, this.pageElements);
     }
 }

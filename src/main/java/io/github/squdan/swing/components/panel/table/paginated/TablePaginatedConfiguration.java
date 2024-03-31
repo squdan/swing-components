@@ -19,4 +19,6 @@ public class TablePaginatedConfiguration<T, K> extends TableConfiguration<T, K> 
     private final TablePaginatedDataProvider<K> provider;
 
     private List<QueryDslFilter> baseFilters;
+
+    private Integer pageElements;
 }

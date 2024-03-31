@@ -1,17 +1,22 @@
 package io.github.squdan.swing.components.panel.table.paginated;
 
+import io.github.squdan.swing.components.configuration.SwingComponents;
 import io.github.squdan.swing.components.panel.table.common.action.TableActions;
 import io.github.squdan.swing.components.panel.table.common.model.ColumnInfo;
 import io.github.squdan.swing.components.panel.table.common.model.GenericTableModel;
 import io.github.squdan.swing.components.panel.table.normal.TablePanel;
 import io.github.squdan.swing.components.panel.table.paginated.model.FilterPaginatedTextField;
 import io.github.squdan.swing.components.panel.table.paginated.provider.TablePaginatedContext;
+import io.github.squdan.swing.components.text.PlaceholderValidatedTextField;
+import io.github.squdan.swing.components.text.ReadOnlyTextField;
 import io.github.squdan.swing.components.util.ViewUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import javax.swing.*;
 import javax.swing.table.TableRowSorter;
+import java.awt.*;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +39,17 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
     @Serial
     private static final long serialVersionUID = 8438204457727336847L;
 
+    // Configuration
+    public static Integer DEFAULT_PAGE_SIZE = 2;
+
     // Data
     private final TablePaginatedContext<K> paginationContext;
+
+    // Components
+    private final JTextField page = new PlaceholderValidatedTextField(PlaceholderValidatedTextField.TextFieldRestrictions.CommonRestrictions.INTEGER.getRestrictions());
+    private final JTextField pages = new ReadOnlyTextField("Páginas");
+    private final JButton previous = ViewUtils.getDefaultColorButton("Previa");
+    private final JButton next = ViewUtils.getDefaultColorButton("Siguiente");
 
     /**
      * Constructor to configure table requirements.
@@ -44,8 +58,39 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
      */
     public TablePaginatedPanel(final TablePaginatedConfiguration<T, K> configuration) {
         super(configuration, false);
-        this.paginationContext = new TablePaginatedContext<>(this, configuration.getTableModel(), configuration.getProvider(), configuration.getBaseFilters());
+        this.paginationContext = new TablePaginatedContext<>(
+                this,
+                configuration.getTableModel(),
+                configuration.getProvider(),
+                configuration.getBaseFilters(),
+                Objects.nonNull(configuration.getPageElements()) ? configuration.getPageElements() : DEFAULT_PAGE_SIZE);
         this.paginationContext.find();
+
+        // Update pagination components
+        this.page.setText(String.valueOf(this.paginationContext.getCurrentPage()));
+        this.pages.setText(String.valueOf(this.paginationContext.getTotalPages()));
+
+        // Configure action listeners
+        /*page.getDocument().addDocumentListener(e -> {
+
+        });*/
+        next.addActionListener(e -> {
+            final String currentPage = this.page.getText();
+
+            if (NumberUtils.isDigits(currentPage) && NumberUtils.toInt(currentPage) < NumberUtils.toInt(this.pages.getText())) {
+                this.paginationContext.nextPage();
+                this.page.setText(String.valueOf(this.paginationContext.getCurrentPage()));
+            }
+        });
+
+        previous.addActionListener(e -> {
+            final String currentPage = this.page.getText();
+
+            if (NumberUtils.isDigits(currentPage) && NumberUtils.toInt(currentPage) > 0) {
+                this.paginationContext.previousPage();
+                this.page.setText(String.valueOf(this.paginationContext.getCurrentPage()));
+            }
+        });
 
         // Configure paginated representation
         configureTablePaginatedRepresentation(configuration);
@@ -66,7 +111,20 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
             // Panel configuration
             final JPanel tablePanel = ViewUtils.generateVerticalBigPanelMultipleHeaders(tableContainer,
                     filters.toArray(new FilterPaginatedTextField[0]));
-            this.add(ViewUtils.generateVerticalBigPanelMultipleHeaders(tablePanel, getTableTitle(configuration.getTitle())));
+
+            final JPanel paginationConfigurationPanel = new JPanel(new GridLayout(1, 0));
+            paginationConfigurationPanel.setBackground(Color.DARK_GRAY);
+            paginationConfigurationPanel.add(getTableHeader("Página"));
+            paginationConfigurationPanel.add(this.page);
+            paginationConfigurationPanel.add(getTableHeader("de"));
+            paginationConfigurationPanel.add(this.pages);
+
+            final JPanel tablePaginatedPanel = ViewUtils.generateVerticalBigPanelMultipleHeaders(
+                    tablePanel,
+                    previous,
+                    paginationConfigurationPanel,
+                    next);
+            this.add(ViewUtils.generateVerticalBigPanelMultipleHeaders(tablePaginatedPanel, getTableTitle(configuration.getTitle())));
         } else {
             // Configure default sorting
             this.table.setAutoCreateRowSorter(true);
@@ -109,5 +167,17 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
 
     public void refresh() {
         this.table.repaint();
+    }
+
+    private JComponent getTableHeader(final String text) {
+        final JLabel dashboardTitle = new JLabel(text, SwingConstants.CENTER);
+        dashboardTitle.setForeground(SwingComponents.getConfiguration().getColorConfiguration().getPrimaryText());
+        dashboardTitle.setFont(SwingComponents.getConfiguration().getTextConfiguration().getTitleSecondaryFont());
+
+        // Panel to set background
+        final JPanel result = new JPanel(new GridLayout(1, 1));
+        result.setBackground(Color.DARK_GRAY);
+        result.add(dashboardTitle);
+        return result;
     }
 }
