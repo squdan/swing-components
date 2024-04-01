@@ -90,7 +90,7 @@ public class GenericTableModel<T> extends AbstractTableModel {
     public Object getValueAt(int rowIndex) {
         Object result = null;
 
-        if (CollectionUtils.isNotEmpty(values)) {
+        if (CollectionUtils.isNotEmpty(values) && values.size() > rowIndex) {
             result = values.get(rowIndex);
         }
 

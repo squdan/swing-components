@@ -98,13 +98,17 @@ public class TablePaginatedContext<T> {
         // Requirements
         Assert.notNull(this.provider, "Provider not configured.");
 
-        // Update pagination configuration
-        this.customFilters = filters;
-
-        if (Objects.nonNull(this.pageConfiguration)) {
-            this.pageConfiguration = this.pageConfiguration.first();
-        } else {
+        // Configuring pagination for first execution
+        if (Objects.isNull(this.pageConfiguration)) {
             setDefaultPageable();
+        }
+
+        // Update filters and pagination configuration
+        if (areFiltersChanging(filters)) {
+            this.customFilters = filters;
+
+            // If filters has changed, searching starts at first page
+            this.pageConfiguration = this.pageConfiguration.first();
         }
 
         updateSorting(sort);
@@ -124,6 +128,12 @@ public class TablePaginatedContext<T> {
         try {
             this.currentPage = this.provider.find(joinFilters, this.pageConfiguration);
             this.tableModel.setData(this.currentPage.getContent());
+
+            // Elements may be deleted, so we navigate to last page
+            if ((getCurrentPage() >= getTotalPages()) && this.currentPage.isEmpty()) {
+                toPage(getTotalPages() - 1);
+            }
+
             this.table.refresh();
         } catch (final Exception e) {
             final String errorMsg = "Error interno durante la búsqueda.";
@@ -131,26 +141,15 @@ public class TablePaginatedContext<T> {
         }
     }
 
-    public void updatePage(final int pageNumber, final int pageSize) {
-        if (Objects.nonNull(this.pageConfiguration)) {
-            this.pageConfiguration = PageRequest.of(pageNumber, pageSize, this.pageConfiguration.getSort());
-        } else {
-            this.pageConfiguration = PageRequest.of(pageNumber, pageSize);
-        }
-    }
+    public void toPage(final int page) {
+        // Requirements
+        Assert.notNull(this.provider, "Provider not configured.");
+        Assert.notNull(this.pageConfiguration, "Pageable not configured.");
+        Assert.notNull(this.currentPage, "Execute find method first.");
 
-    public void updateSorting(final Sort sort) {
-        if (Objects.nonNull(sort)) {
-            if (Objects.nonNull(this.pageConfiguration)) {
-                this.pageConfiguration = PageRequest.of(this.pageConfiguration.getPageNumber(), this.pageConfiguration.getPageSize(), sort);
-            } else {
-                setDefaultPageable();
-            }
-        }
-    }
-
-    public void updatePageAndSorting(final int pageNumber, final int pageSize, final Sort sort) {
-        this.pageConfiguration = PageRequest.of(pageNumber, pageSize, sort);
+        // Execution
+        updatePage(page, this.pageElements);
+        find(this.customFilters);
     }
 
     public void nextPage() {
@@ -177,5 +176,41 @@ public class TablePaginatedContext<T> {
 
     private void setDefaultPageable() {
         updatePage(0, this.pageElements);
+    }
+
+    private boolean areFiltersChanging(final List<QueryDslFilter> filters) {
+        boolean result = true;
+
+        if (Objects.isNull(this.customFilters) && Objects.isNull(filters)) {
+            result = false;
+        } else if (Objects.nonNull(this.customFilters) && Objects.nonNull(filters)) {
+            if (CollectionUtils.isEqualCollection(this.customFilters, filters)) {
+                result = false;
+            }
+        }
+
+        return result;
+    }
+
+    public void updatePage(final int pageNumber, final int pageSize) {
+        if (Objects.nonNull(this.pageConfiguration)) {
+            this.pageConfiguration = PageRequest.of(pageNumber, pageSize, this.pageConfiguration.getSort());
+        } else {
+            this.pageConfiguration = PageRequest.of(pageNumber, pageSize);
+        }
+    }
+
+    public void updateSorting(final Sort sort) {
+        if (Objects.nonNull(sort)) {
+            if (Objects.nonNull(this.pageConfiguration)) {
+                this.pageConfiguration = PageRequest.of(this.pageConfiguration.getPageNumber(), this.pageConfiguration.getPageSize(), sort);
+            } else {
+                setDefaultPageable();
+            }
+        }
+    }
+
+    public void updatePageAndSorting(final int pageNumber, final int pageSize, final Sort sort) {
+        this.pageConfiguration = PageRequest.of(pageNumber, pageSize, sort);
     }
 }

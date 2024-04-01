@@ -64,11 +64,10 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
                 configuration.getProvider(),
                 configuration.getBaseFilters(),
                 Objects.nonNull(configuration.getPageElements()) ? configuration.getPageElements() : DEFAULT_PAGE_SIZE);
-        this.paginationContext.find();
 
         // Update pagination components
-        this.page.setText(String.valueOf(this.paginationContext.getCurrentPage()));
-        this.pages.setText(String.valueOf(this.paginationContext.getTotalPages()));
+        this.page.setText(String.valueOf(0));
+        this.pages.setText(String.valueOf(0));
 
         // Configure action listeners
         /*page.getDocument().addDocumentListener(e -> {
@@ -79,16 +78,16 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
 
             if (NumberUtils.isDigits(currentPage) && NumberUtils.toInt(currentPage) < NumberUtils.toInt(this.pages.getText())) {
                 this.paginationContext.nextPage();
-                this.page.setText(String.valueOf(this.paginationContext.getCurrentPage()));
+                this.page.setText(String.valueOf(this.paginationContext.getCurrentPage() + 1));
             }
         });
 
         previous.addActionListener(e -> {
             final String currentPage = this.page.getText();
 
-            if (NumberUtils.isDigits(currentPage) && NumberUtils.toInt(currentPage) > 0) {
+            if (NumberUtils.isDigits(currentPage) && NumberUtils.toInt(currentPage) > 1) {
                 this.paginationContext.previousPage();
-                this.page.setText(String.valueOf(this.paginationContext.getCurrentPage()));
+                this.page.setText(String.valueOf(this.paginationContext.getCurrentPage() + 1));
             }
         });
 
@@ -162,11 +161,14 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
     }
 
     public void reload() {
-        this.paginationContext.reload();
-    }
+        log.info("[TABLE-PAGINATED] Recargando tabla.");
 
-    public void refresh() {
-        this.table.repaint();
+        // Reload table information
+        this.paginationContext.reload();
+
+        // Update pagination components
+        this.page.setText(String.valueOf(this.paginationContext.getCurrentPage() + 1));
+        this.pages.setText(String.valueOf(this.paginationContext.getTotalPages()));
     }
 
     private JComponent getTableHeader(final String text) {

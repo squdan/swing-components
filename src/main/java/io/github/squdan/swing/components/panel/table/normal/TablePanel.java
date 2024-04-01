@@ -197,4 +197,8 @@ public class TablePanel<T, K> extends JPanel {
         result.add(dashboardTitle);
         return result;
     }
+
+    public void refresh() {
+        this.table.repaint();
+    }
 }
