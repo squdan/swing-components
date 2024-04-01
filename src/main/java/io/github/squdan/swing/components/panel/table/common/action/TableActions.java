@@ -2,12 +2,16 @@ package io.github.squdan.swing.components.panel.table.common.action;
 
 import io.github.squdan.swing.components.panel.calendar.action.CalendarDataManagerService;
 import io.github.squdan.swing.components.panel.calendar.cell.CalendarDayCell;
-import io.github.squdan.swing.components.panel.table.normal.TablePanel;
 import io.github.squdan.swing.components.panel.table.common.model.ColumnInfo;
+import io.github.squdan.swing.components.panel.table.normal.TablePanel;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.util.Objects;
 
 /**
  * Default table actions that user can apply over each cell into {@link TablePanel}.
@@ -18,6 +22,9 @@ import java.awt.event.ActionEvent;
 @Slf4j
 public class TableActions<T> {
 
+    // Configuration
+    private static final Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
+
     // Services
     protected final TableDataManagerService<T> service;
 
@@ -27,6 +34,7 @@ public class TableActions<T> {
 
     // Components: table actions
     protected final JPopupMenu cellActionsMenu = new JPopupMenu();
+    protected final JMenuItem tableActionCopy = new JMenuItem("Copiar");
     protected final JMenuItem tableActionSee = new JMenuItem("Ver");
     protected final JMenuItem tableActionNew = new JMenuItem("Nuevo");
     protected final JMenuItem tableActionUpdate = new JMenuItem("Actualizar");
@@ -62,6 +70,7 @@ public class TableActions<T> {
             tableActionsMenu.add(globalActionNew);
 
             // Initialize table actions JPopupMenu
+            cellActionsMenu.add(tableActionCopy);
             cellActionsMenu.add(tableActionSee);
             cellActionsMenu.add(tableActionNew);
             cellActionsMenu.add(tableActionUpdate);
@@ -72,29 +81,33 @@ public class TableActions<T> {
     /**
      * Method used at {@link TablePanel} when some {@link java.awt.event.ActionEvent} is caught.
      *
-     * @param source     {@link ActionEvent} source event.
-     * @param command    {@link ActionEvent} action command.
-     * @param cellValue  {@link CalendarDayCell} cell value where user clicked to select some action.
-     * @param columnInfo {@link ColumnInfo} from selected cell from user.
-     * @param row        from selected cell from user.
-     * @param column     from selected cell from user.
+     * @param source      {@link ActionEvent} source event.
+     * @param command     {@link ActionEvent} action command.
+     * @param rowValue    {@link CalendarDayCell} cell value where user clicked to select some action.
+     * @param columnValue {@link ColumnInfo} from selected cell from user.
+     * @param row         from selected cell from user.
+     * @param column      from selected cell from user.
      * @return true if refresh needed.
      */
-    public boolean manageActionEvents(final Object source, final String command, final T cellValue, final Object columnInfo,
+    public boolean manageActionEvents(final Object source, final String command, final T rowValue, final Object columnValue,
                                       final int row, final int column) {
         if (globalActionNew == source) {
-            service.create(command, cellValue, columnInfo);
+            service.create(command, rowValue, columnValue);
+        } else if (tableActionCopy == source) {
+            if (Objects.nonNull(columnValue)) {
+                addValueToClipboard(String.valueOf(columnValue));
+            }
         } else if (tableActionSee == source) {
-            service.see(command, cellValue, columnInfo);
+            service.see(command, rowValue, columnValue);
         } else if (tableActionNew == source) {
-            service.create(command, cellValue, columnInfo);
+            service.create(command, rowValue, columnValue);
         } else if (tableActionUpdate == source) {
-            service.update(command, cellValue, columnInfo);
+            service.update(command, rowValue, columnValue);
         } else if (tableActionDelete == source) {
-            service.delete(command, cellValue, columnInfo);
+            service.delete(command, rowValue, columnValue);
         } else {
-            log.warn("Acción desconocida sobre la fila '{}' en el elemento '{}' en fila '{}' y columna '{}'", cellValue,
-                    columnInfo, row, column);
+            log.warn("Acción desconocida sobre la fila '{}' en el elemento '{}' en fila '{}' y columna '{}'", rowValue,
+                    columnValue, row, column);
         }
 
         return true;
@@ -118,5 +131,9 @@ public class TableActions<T> {
      */
     public JPopupMenu getAvailableCellActions() {
         return cellActionsMenu;
+    }
+
+    private void addValueToClipboard(final String cellValue) {
+        CLIPBOARD.setContents(new StringSelection(cellValue), null);
     }
 }

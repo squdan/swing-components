@@ -42,14 +42,14 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
     private static final long serialVersionUID = 8438204457727336847L;
 
     // Configuration
-    public static Integer DEFAULT_PAGE_SIZE = 2;
+    public static Integer DEFAULT_PAGE_SIZE = 50;
 
     // Data
     private final TablePaginatedContext<K> paginationContext;
 
     // Components
-    private final JTextField page = new PlaceholderValidatedTextField(PlaceholderValidatedTextField.TextFieldRestrictions.CommonRestrictions.INTEGER.getRestrictions());
-    private final JTextField pages = new ReadOnlyTextField("Páginas");
+    public final JTextField page = new PlaceholderValidatedTextField(PlaceholderValidatedTextField.TextFieldRestrictions.CommonRestrictions.INTEGER.getRestrictions());
+    public final JTextField pages = new ReadOnlyTextField("Páginas");
     private final JButton previous = ViewUtils.getDefaultColorButton("Previa");
     private final JButton next = ViewUtils.getDefaultColorButton("Siguiente");
 
@@ -87,8 +87,6 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
                     } else {
                         paginationContext.toPage(currentPageNumber - 1);
                     }
-
-                    page.setText(String.valueOf(paginationContext.getCurrentPage() + 1));
                 }
             }
         });
@@ -101,7 +99,6 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
 
                 if (currentPageNumber < NumberUtils.toInt(this.pages.getText())) {
                     this.paginationContext.nextPage();
-                    this.page.setText(String.valueOf(this.paginationContext.getCurrentPage() + 1));
                 }
             }
         });
@@ -114,7 +111,6 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
 
                 if (currentPageNumber > 1) {
                     this.paginationContext.previousPage();
-                    this.page.setText(String.valueOf(this.paginationContext.getCurrentPage() + 1));
                 }
             }
         });
@@ -194,10 +190,6 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
 
         // Reload table information
         this.paginationContext.reload();
-
-        // Update pagination components
-        this.page.setText(String.valueOf(this.paginationContext.getCurrentPage() + 1));
-        this.pages.setText(String.valueOf(this.paginationContext.getTotalPages()));
     }
 
     private JComponent getTableHeader(final String text) {

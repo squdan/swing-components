@@ -5,6 +5,7 @@ import io.github.squdan.swing.components.panel.table.common.model.GenericTableMo
 import io.github.squdan.swing.components.panel.table.paginated.TablePaginatedPanel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Getter
 @RequiredArgsConstructor
 public class TablePaginatedContext<T> {
@@ -126,19 +128,28 @@ public class TablePaginatedContext<T> {
 
         // Execute search and save results
         try {
+            // Execute search
             this.currentPage = this.provider.find(joinFilters, this.pageConfiguration);
             this.tableModel.setData(this.currentPage.getContent());
 
             // Elements may be deleted, so we navigate to last page
-            if ((getCurrentPage() >= getTotalPages()) && this.currentPage.isEmpty()) {
+            if ((getCurrentPage() >= getTotalPages()) && this.currentPage.isEmpty() && getTotalPages() > 0) {
                 toPage(getTotalPages() - 1);
             }
 
+            updateTablePagination();
             this.table.refresh();
         } catch (final Exception e) {
+            log.error("Error durante la búsqueda de la tabla paginada. Error: ", e);
             final String errorMsg = "Error interno durante la búsqueda.";
             JOptionPane.showMessageDialog(null, errorMsg, "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public void updateTablePagination() {
+        // Update pagination components
+        this.table.page.setText(String.valueOf(this.getCurrentPage() + 1));
+        this.table.pages.setText(String.valueOf(this.getTotalPages()));
     }
 
     public void toPage(final int page) {

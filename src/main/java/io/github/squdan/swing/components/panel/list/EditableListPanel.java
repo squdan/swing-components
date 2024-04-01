@@ -57,11 +57,11 @@ public class EditableListPanel<T extends SwingComponentsItem<K>, K> extends JPan
 
         // Initializations
         this.managementService = managementService;
-        this.availableValues = values;
+        this.availableValues = new ArrayList<>(values);
         this.selectedValues = new ArrayList<>();
         this.availableElementsListModel = new DefaultListModel<>();
         this.availableElementsList = new JList<>(availableElementsListModel);
-        this.searchAutocompleteTextField = new PlaceholderSearchAutocompleteTextField<>(values);
+        this.searchAutocompleteTextField = new PlaceholderSearchAutocompleteTextField<>(this.availableValues);
 
         // Configure elements list
         availableElementsList.setCellRenderer(new ListItemTextFieldCellRenderer());
@@ -149,7 +149,7 @@ public class EditableListPanel<T extends SwingComponentsItem<K>, K> extends JPan
         @Override
         public void actionPerformed(final ActionEvent e) {
             if (Objects.nonNull(managementService)) {
-                T createdElement = managementService.create();
+                final T createdElement = managementService.create();
 
                 if (Objects.nonNull(createdElement)) {
                     availableValues.add(createdElement);

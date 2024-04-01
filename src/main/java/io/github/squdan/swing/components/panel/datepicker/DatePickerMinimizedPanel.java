@@ -2,7 +2,6 @@ package io.github.squdan.swing.components.panel.datepicker;
 
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
-import io.github.squdan.swing.components.util.date.DateTimeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
@@ -83,6 +82,12 @@ public class DatePickerMinimizedPanel extends JPanel {
         if (Objects.nonNull(selectedDate)) {
             final LocalDate selectedLocalDate = LocalDate.ofInstant(selectedDate, TimeZone.getDefault().toZoneId());
             datePicker.setDate(selectedLocalDate);
+        }
+    }
+
+    public void setSelectedDate(final LocalDate selectedDate) {
+        if (Objects.nonNull(selectedDate)) {
+            datePicker.setDate(selectedDate);
         }
     }
 

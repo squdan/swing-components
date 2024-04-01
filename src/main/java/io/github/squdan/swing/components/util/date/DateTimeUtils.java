@@ -184,6 +184,32 @@ public final class DateTimeUtils {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class ZonedDateTimeSourceMethods {
+        /**
+         * Returns received LocalDateTime as String with the next format
+         * DateTimeUtils.DATE_FORMAT
+         * <p>
+         * If null is received then this method will return null.
+         *
+         * @param date (java.util.LocalDateTime) to parse to String.
+         * @return (String) Date.
+         */
+        public static String toString(final ZonedDateTime date) {
+            String result = null;
+
+            if (Objects.nonNull(date)) {
+                try {
+                    result = date.format(LOCAL_DATE_TIME_FORMATTER_DEFAULT);
+                } catch (final DateTimeException e) {
+                    log.warn("Error formateando fecha como String '{}'. Error: ", date, e);
+                }
+            }
+
+            return result;
+        }
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class InstantSourceMethods {
 
         /**

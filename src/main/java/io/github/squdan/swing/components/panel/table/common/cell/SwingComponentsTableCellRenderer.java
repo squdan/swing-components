@@ -34,7 +34,7 @@ public class SwingComponentsTableCellRenderer extends DefaultTableCellRenderer {
             } else if (value instanceof LocalDate date) {
                 cellValue = DateTimeUtils.LocalDateSourceMethods.toString(date);
             } else if (value instanceof LocalDateTime date) {
-                cellValue = DateTimeUtils.LocalDateTimeSourceMethods.toString(date);
+                cellValue = DateTimeUtils.ZonedDateTimeSourceMethods.toString(date.atZone(TimeZone.getDefault().toZoneId()));
             } else if (value instanceof Color) {
                 cellValue = colorToString((Color) value);
             }
