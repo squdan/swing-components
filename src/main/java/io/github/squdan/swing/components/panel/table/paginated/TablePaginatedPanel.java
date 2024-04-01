@@ -17,6 +17,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import javax.swing.*;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,24 +72,50 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
         this.pages.setText(String.valueOf(0));
 
         // Configure action listeners
-        /*page.getDocument().addDocumentListener(e -> {
+        page.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                final String currentPage = page.getText();
 
-        });*/
+                if (NumberUtils.isDigits(currentPage)) {
+                    final int currentPageNumber = NumberUtils.toInt(currentPage);
+
+                    if (currentPageNumber <= 0) {
+                        paginationContext.toPage(0);
+                    } else if (currentPageNumber >= paginationContext.getTotalPages()) {
+                        paginationContext.toPage(paginationContext.getTotalPages() - 1);
+                    } else {
+                        paginationContext.toPage(currentPageNumber - 1);
+                    }
+
+                    page.setText(String.valueOf(paginationContext.getCurrentPage() + 1));
+                }
+            }
+        });
+
         next.addActionListener(e -> {
             final String currentPage = this.page.getText();
 
-            if (NumberUtils.isDigits(currentPage) && NumberUtils.toInt(currentPage) < NumberUtils.toInt(this.pages.getText())) {
-                this.paginationContext.nextPage();
-                this.page.setText(String.valueOf(this.paginationContext.getCurrentPage() + 1));
+            if (NumberUtils.isDigits(currentPage)) {
+                final int currentPageNumber = NumberUtils.toInt(currentPage);
+
+                if (currentPageNumber < NumberUtils.toInt(this.pages.getText())) {
+                    this.paginationContext.nextPage();
+                    this.page.setText(String.valueOf(this.paginationContext.getCurrentPage() + 1));
+                }
             }
         });
 
         previous.addActionListener(e -> {
             final String currentPage = this.page.getText();
 
-            if (NumberUtils.isDigits(currentPage) && NumberUtils.toInt(currentPage) > 1) {
-                this.paginationContext.previousPage();
-                this.page.setText(String.valueOf(this.paginationContext.getCurrentPage() + 1));
+            if (NumberUtils.isDigits(currentPage)) {
+                final int currentPageNumber = NumberUtils.toInt(currentPage);
+
+                if (currentPageNumber > 1) {
+                    this.paginationContext.previousPage();
+                    this.page.setText(String.valueOf(this.paginationContext.getCurrentPage() + 1));
+                }
             }
         });
 
@@ -133,7 +161,8 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
         }
     }
 
-    private List<FilterPaginatedTextField<K>> configureTablePaginatedFilters(final TablePaginatedConfiguration<T, K> configuration) {
+    private List<FilterPaginatedTextField<K>> configureTablePaginatedFilters(
+            final TablePaginatedConfiguration<T, K> configuration) {
         final List<FilterPaginatedTextField<K>> filters = new ArrayList<>();
 
         // Generate table sorter from table model
