@@ -307,9 +307,14 @@ public class CalendarPanel extends JPanel {
 
     private class SelectCellMouseListener extends MouseAdapter {
         @Override
-        public void mousePressed(MouseEvent e) {
+        public void mousePressed(final MouseEvent e) {
             selectedRow = calendarTable.rowAtPoint(e.getPoint());
             selectedColumn = calendarTable.columnAtPoint(e.getPoint());
+
+            // If double click, then open popup menu
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                calendarTable.getComponentPopupMenu().show(calendarTable, e.getX(), e.getY());
+            }
         }
     }
 }
