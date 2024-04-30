@@ -5,6 +5,7 @@ import io.github.squdan.swing.components.panel.table.common.action.TableActions;
 import io.github.squdan.swing.components.panel.table.common.model.ColumnInfo;
 import io.github.squdan.swing.components.panel.table.common.model.GenericTableModel;
 import io.github.squdan.swing.components.panel.table.normal.TablePanel;
+import io.github.squdan.swing.components.panel.table.paginated.action.TablePaginatedSortedListener;
 import io.github.squdan.swing.components.panel.table.paginated.model.FilterPaginatedTextField;
 import io.github.squdan.swing.components.panel.table.paginated.provider.TablePaginatedContext;
 import io.github.squdan.swing.components.text.PlaceholderValidatedTextField;
@@ -163,10 +164,11 @@ public class TablePaginatedPanel<T, K> extends TablePanel<T, K> {
 
         // Generate table sorter from table model
         final TableRowSorter<GenericTableModel<K>> sorter = new TableRowSorter<>(this.tableModel);
+        sorter.addRowSorterListener(new TablePaginatedSortedListener<>(this.paginationContext));
 
         // Generate filters for each configured column
         for (ColumnInfo column : this.tableModel.getColumns()) {
-            filters.add(new FilterPaginatedTextField<>(column.getName(), paginationContext, column.getNumber()));
+            filters.add(new FilterPaginatedTextField<>(column.getName(), this.paginationContext, column.getNumber()));
         }
 
         // Configure filters to clean each other

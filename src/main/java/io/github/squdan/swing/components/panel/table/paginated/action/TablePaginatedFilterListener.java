@@ -191,8 +191,12 @@ public class TablePaginatedFilterListener<T> implements DocumentListener {
                     .value(filter)
                     .build();
         } else {
-            final String errorMsg = String.format("Tipo '%s' de la columna desconocido.", columnType);
-            JOptionPane.showMessageDialog(null, errorMsg, "Error", JOptionPane.ERROR_MESSAGE);
+            log.warn(String.format("Tipo '%s' de la columna desconocido, se tratará como un String.", columnType));
+            result = QueryDslFilter.builder()
+                    .key(columnName)
+                    .operator(QueryDslOperators.CONTAIN_FUNCTION)
+                    .value(filter)
+                    .build();
         }
 
         return result;

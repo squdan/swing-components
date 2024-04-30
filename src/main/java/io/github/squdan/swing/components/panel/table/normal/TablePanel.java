@@ -199,6 +199,7 @@ public class TablePanel<T, K> extends JPanel {
     }
 
     public void refresh() {
+        this.tableModel.fireTableDataChanged();
         this.table.repaint();
     }
 }
