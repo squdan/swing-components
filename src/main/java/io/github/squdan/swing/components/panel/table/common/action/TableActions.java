@@ -91,6 +91,8 @@ public class TableActions<T> {
      */
     public boolean manageActionEvents(final Object source, final String command, final T rowValue, final Object columnValue,
                                       final int row, final int column) {
+        boolean refresh = true;
+
         if (globalActionNew == source) {
             service.create(command, rowValue, columnValue);
         } else if (tableActionCopy == source) {
@@ -99,6 +101,7 @@ public class TableActions<T> {
             }
         } else if (tableActionSee == source) {
             service.see(command, rowValue, columnValue);
+            refresh = false;
         } else if (tableActionNew == source) {
             service.create(command, rowValue, columnValue);
         } else if (tableActionUpdate == source) {
@@ -110,7 +113,7 @@ public class TableActions<T> {
                     columnValue, row, column);
         }
 
-        return true;
+        return refresh;
     }
 
     /**
