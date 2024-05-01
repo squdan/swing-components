@@ -1,6 +1,7 @@
 package io.github.squdan.swing.components.panel.splashscreen;
 
 import io.github.squdan.swing.components.util.ViewUtils;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
@@ -17,18 +18,30 @@ public class Splashscreen {
     private BackgroundWorker SPLASH_SCREEN_INSTANCE;
 
     /**
-     * Configures the splash-screen to show.
+     * Returns builder to configure splash-screen.
      *
-     * @param title        to show.
-     * @param message      to show.
-     * @param imagePath    to show.
-     * @param progressTime time to increase 1% (milliseconds).
+     * @return builder.
      */
-    public Splashscreen(final String title, final String message, final String imagePath, final int progressTime) {
-        EventQueue.invokeLater(() -> {
-            SPLASH_SCREEN_INSTANCE = new BackgroundWorker(title, message, getSplashImage(imagePath), progressTime);
-            SPLASH_SCREEN_INSTANCE.execute();
-        });
+    public static SplashscreenBuilder builder() {
+        return new SplashscreenBuilder();
+    }
+
+    /**
+     * Starts splash-screen.
+     */
+    public void start() {
+        if (Objects.nonNull(SPLASH_SCREEN_INSTANCE)) {
+            EventQueue.invokeLater(() -> SPLASH_SCREEN_INSTANCE.execute());
+        }
+    }
+
+    /**
+     * Closes manually the splash-screen if still open.
+     */
+    public void close() {
+        if (Objects.nonNull(SPLASH_SCREEN_INSTANCE)) {
+            SPLASH_SCREEN_INSTANCE.cancel(true);
+        }
     }
 
     /**
@@ -39,34 +52,52 @@ public class Splashscreen {
      * @param image        to show.
      * @param progressTime time to increase 1% (milliseconds).
      */
-    public Splashscreen(final String title, final String message, final Image image, final int progressTime) {
-        EventQueue.invokeLater(() -> {
-            SPLASH_SCREEN_INSTANCE = new BackgroundWorker(title, message, image, progressTime);
-            SPLASH_SCREEN_INSTANCE.execute();
-        });
+    protected Splashscreen(final String title, final String message, final Image image, final Integer progressTime) {
+        SPLASH_SCREEN_INSTANCE = new BackgroundWorker(title, message, image, progressTime);
     }
 
-    /**
-     * Closes manually the splash-screen if still open.
-     */
-    public void closeIfStillOpen() {
-        if (Objects.nonNull(SPLASH_SCREEN_INSTANCE)) {
-            SPLASH_SCREEN_INSTANCE.cancel(true);
-        }
-    }
+    @NoArgsConstructor
+    public static class SplashscreenBuilder {
 
-    private Image getSplashImage(final String imagePath) {
-        Image result = null;
+        // Data
+        private String title = null;
+        private String message = null;
+        private Image image = null;
+        private Integer timeDuration = null;
 
-        if (StringUtils.isNotBlank(imagePath)) {
-            final URL dateImageURL = this.getClass().getResource(imagePath);
-
-            if (Objects.nonNull(dateImageURL)) {
-                result = Toolkit.getDefaultToolkit().getImage(dateImageURL);
-            }
+        public SplashscreenBuilder title(final String source) {
+            this.title = source;
+            return this;
         }
 
-        return result;
+        public SplashscreenBuilder message(final String source) {
+            this.message = source;
+            return this;
+        }
+
+        public SplashscreenBuilder image(final String source) {
+            this.image = getSplashImage(source);
+            return this;
+        }
+
+        public SplashscreenBuilder image(final Image source) {
+            this.image = source;
+            return this;
+        }
+
+        public SplashscreenBuilder timeInSecconds(final int time) {
+            this.timeDuration = (int) Math.ceil((double) time * 1000 / ((double) 100));
+            return this;
+        }
+
+        public SplashscreenBuilder timeInMillis(final int time) {
+            this.timeDuration = (int) Math.ceil((double) time / ((double) 100));
+            return this;
+        }
+
+        public Splashscreen build() {
+            return new Splashscreen(title, message, image, timeDuration);
+        }
     }
 
     private static class BackgroundWorker extends SwingWorker<Void, Void> {
@@ -75,11 +106,12 @@ public class Splashscreen {
         private static final String EVENT_PROGRESS_NAME = "progress";
 
         // Data
-        private final int progressTime;
-        private JProgressBar pb;
+        private final Integer progressTime;
+        private JProgressBar progressBar;
         private JDialog dialog;
+        private boolean running = true;
 
-        public BackgroundWorker(final String title, final String message, final Image image, final int progressTime) {
+        public BackgroundWorker(final String title, final String message, final Image image, final Integer progressTime) {
             this.progressTime = progressTime;
 
             addPropertyChangeListener(evt -> {
@@ -104,9 +136,9 @@ public class Splashscreen {
                         }
 
                         // Adds progress bar to the popup
-                        pb = new JProgressBar();
+                        progressBar = new JProgressBar();
                         final JPanel progressBarPanel = new JPanel();
-                        progressBarPanel.add(pb);
+                        progressBarPanel.add(progressBar);
                         panel.add(progressBarPanel);
 
                         // Popup configuration
@@ -121,7 +153,7 @@ public class Splashscreen {
                     }
 
                     // Actualiza el progreso
-                    pb.setValue(getProgress());
+                    progressBar.setValue(getProgress());
                 }
             });
         }
@@ -130,16 +162,39 @@ public class Splashscreen {
         protected void done() {
             if (Objects.nonNull(dialog)) {
                 dialog.dispose();
+                running = false;
             }
         }
 
         @Override
         protected Void doInBackground() throws Exception {
-            for (int index = 0; index < 100; index++) {
-                setProgress(index);
-                Thread.sleep(progressTime);
+            if (Objects.nonNull(progressTime)) {
+                for (int index = 0; index < 100; index++) {
+                    setProgress(index);
+                    Thread.sleep(progressTime);
+                }
+            } else {
+                while(running) {
+                    setProgress((getProgress() + 1) % 100);
+                    Thread.sleep(5);
+                }
             }
+
             return null;
         }
+    }
+
+    protected static Image getSplashImage(final String imagePath) {
+        Image result = null;
+
+        if (StringUtils.isNotBlank(imagePath)) {
+            final URL dateImageURL = Splashscreen.class.getResource(imagePath);
+
+            if (Objects.nonNull(dateImageURL)) {
+                result = Toolkit.getDefaultToolkit().getImage(dateImageURL);
+            }
+        }
+
+        return result;
     }
 }
